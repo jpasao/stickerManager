@@ -1,7 +1,7 @@
-using System.Text.Json.Serialization;
 using sticker.Code;
 using sticker.Interfaces;
 using sticker.Repositories;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 var policyName = "AllowAll";
@@ -34,13 +34,13 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsProduction())
 {
     app.UseHsts();
     app.UseDeveloperExceptionPage();
     app.UseCors(policyName);
 } 
-else
+if (app.Environment.IsDevelopment())
 {
     app.Use((context, next) =>
     {
@@ -48,14 +48,13 @@ else
     });
 } 
 
-
 app.UseStaticFiles();
 app.UseRouting();
 app.UseCors(policyName);
-app.Urls.Add("http://*:5001");
+app.Urls.Add("http://192.168.0.22:5001");
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
-
+    
 app.Run();

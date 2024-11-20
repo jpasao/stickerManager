@@ -1,4 +1,4 @@
-@stickerManager_HostAddress = http://localhost:5033
+@stickerManager_HostAddress = http://localhost:5001
 
 GET {{stickerManager_HostAddress}}/sticker/
 Accept: application/json
