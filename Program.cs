@@ -51,7 +51,7 @@ if (app.Environment.IsDevelopment())
 app.UseStaticFiles();
 app.UseRouting();
 app.UseCors(policyName);
-app.Urls.Add("http://192.168.0.22:5001");
+app.Urls.Add("http://localhost:5001");
 
 app.MapControllerRoute(
     name: "default",

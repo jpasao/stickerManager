@@ -1,0 +1,26 @@
+<c-card>
+  <c-card-header>Filtros</c-card-header>
+  <c-card-body>
+    <p cCardText>Formulario de búsqueda</p>
+    <button cButton>Buscar</button>
+  </c-card-body>
+</c-card>
+<c-card>
+  <c-card-header>Resultados</c-card-header>
+  <c-card-body>
+    <table cTable hover stripped>
+      <thead class="text-nowrap text-truncate">
+        <tr>
+          <th class="bg-body-tertiary">Nombre</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (tag of tags; track tag.IdTag) {
+          <tr>
+            <td>{{tag.TagName}}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </c-card-body>
+</c-card>
