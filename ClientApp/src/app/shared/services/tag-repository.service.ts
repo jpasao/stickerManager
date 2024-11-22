@@ -1,6 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { EnvironmentUrlService } from './environment-url.service';
 import { Tag } from '../../interfaces/tag.model';
 import { EndPoints, ApiAddresses } from '../enums.model';
 import { RequestHelperService } from './request-helper.service'
@@ -11,14 +10,13 @@ import { RequestHelperService } from './request-helper.service'
 export class TagRepositoryService {
 
   constructor(
-    private http: HttpClient, 
-    private envUrl: EnvironmentUrlService,
+    private http: HttpClient,
     private request: RequestHelperService
   ) { }
 
   public getTags = (tag: Tag) => {
     return this.http.post<Tag[]>(
-      this.request.createCompleteRoute(this.envUrl.urlAddress, ApiAddresses.Tag, EndPoints.Get), 
+      this.request.createCompleteRoute(ApiAddresses.Tag, EndPoints.Get), 
       tag, 
       this.request.generateHeaders()
     );
@@ -26,7 +24,7 @@ export class TagRepositoryService {
 
   public createTag = (tag: Tag) => {
     return this.http.post<number>(
-      this.request.createCompleteRoute(this.envUrl.urlAddress, ApiAddresses.Tag, EndPoints.Post), 
+      this.request.createCompleteRoute(ApiAddresses.Tag, EndPoints.Post), 
       tag, 
       this.request.generateHeaders()
     );
@@ -34,7 +32,7 @@ export class TagRepositoryService {
 
   public updateTag = (tag: Tag) => {
     return this.http.put<number>(
-      this.request.createCompleteRoute(this.envUrl.urlAddress, ApiAddresses.Tag, ''), 
+      this.request.createCompleteRoute(ApiAddresses.Tag, ''), 
       tag, 
       this.request.generateHeaders()
     );
@@ -42,7 +40,7 @@ export class TagRepositoryService {
 
   public deleteTag = (tag: Tag) => {
     return this.http.delete<number>(
-      this.request.createCompleteRoute(this.envUrl.urlAddress, ApiAddresses.Tag, '', tag.IdTag)
+      this.request.createCompleteRoute(ApiAddresses.Tag, '', tag.IdTag)
     );
   }
 }
