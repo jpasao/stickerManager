@@ -11,3 +11,8 @@ export enum ApiAddresses {
     Image = 'Image',
     Dashboard = 'Dashboard',
 }
+export enum colorClasses {
+    info = 'info',   
+    warning = 'warning',
+    danger = 'danger',    
+}

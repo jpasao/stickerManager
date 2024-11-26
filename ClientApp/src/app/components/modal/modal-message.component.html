@@ -1,0 +1,13 @@
+<c-modal #questionModal backdrop="static" id="questionModal" [visible]="visible">
+  <c-modal-header>
+    <h5 cModalTitle>{{title()}}</h5>
+    <button [cModalToggle]="questionModal.id" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>{{message()}}</c-modal-body>
+  <c-modal-footer>
+    <button [cModalToggle]="questionModal.id" cButton color="secondary" (click)="handleDialogResponse(false)">
+      Cerrar
+    </button>
+    <button cButton color="primary" (click)="handleDialogResponse(true)">Aceptar</button>
+  </c-modal-footer>
+</c-modal>

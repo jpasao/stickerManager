@@ -1,26 +1,54 @@
 <c-card>
-  <c-card-header>Filtros</c-card-header>
+  <c-card-header>
+    <c-row class="justify-content-between align-items-center">
+      <c-col xs="8" md="1"><span>Filtros</span></c-col>
+      <c-col xs="4" md="1"><button cButton type="reset" color="secondary" (click)="onReset()">Limpiar</button></c-col>
+    </c-row>
+  </c-card-header>
   <c-card-body>
-    <p cCardText>Formulario de búsqueda</p>
-    <button cButton>Buscar</button>
+    <form cForm (ngSubmit)="onSubmit()" [formGroup]="tagForm">
+      <c-row gutter="3" class="align-items-center">
+        <c-col xs="3" md="1">
+          <label cLabel class="col" for="name">Nombre</label>
+        </c-col>
+        <c-col xs="9" md="10">
+          <input cFormControl type="text" formControlName="name" />
+        </c-col>
+        <c-col xs="12" md="1">
+          <button cButton type="submit" class="float-end">Buscar</button>
+        </c-col>
+      </c-row>
+    </form>
   </c-card-body>
 </c-card>
+<br />
 <c-card>
   <c-card-header>Resultados</c-card-header>
   <c-card-body>
-    <table cTable hover stripped>
-      <thead class="text-nowrap text-truncate">
+    <table cTable hover stripped bordered>
+      <thead >
         <tr>
-          <th class="bg-body-tertiary">Nombre</th>
+          <th class="bg-body-tertiary col-md-11">Nombre</th>
+          <th class="bg-body-tertiary col-md-1">Acciones</th>
         </tr>
       </thead>
       <tbody>
         @for (tag of tags; track tag.IdTag) {
           <tr>
             <td>{{tag.TagName}}</td>
+            <td>
+              <button cButton color="warning" variant="ghost" (click)="onEdit(tag)">
+                <svg [cIcon]="actionIcons.cilPencil"></svg>
+              </button>
+              <button cButton color="danger" variant="ghost" (click)="openDeleteModal(tag)">
+                <svg [cIcon]="actionIcons.cilTrash"></svg>
+              </button>
+            </td>
           </tr>
         }
       </tbody>
     </table>
   </c-card-body>
 </c-card>
+<app-modal [title]="modalTitle" [message]="modalMessage" (dialogResponse)="handleDeleteModalResponse($event)"></app-modal>
+<app-toast [colorClass]="toastColor" [message]="toastMessage" [autohide]="toastAutohide"></app-toast>

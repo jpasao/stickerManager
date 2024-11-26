@@ -1,0 +1,10 @@
+<c-toaster placement="top-end" class="p-3" position="fixed">
+  <c-toast #toast="cToast" [autohide]="autohide()" [visible]="visible()" class="align-items-center text-white border-0" [color]="colorClass()">
+    <div class="d-flex">
+      <c-toast-body>
+        <span>{{message()}}</span>
+      </c-toast-body>
+      <button aria-label="close" cButtonClose white class="me-2 m-auto" (click)="toast.visible=false"></button>
+    </div>
+  </c-toast>
+</c-toaster>
