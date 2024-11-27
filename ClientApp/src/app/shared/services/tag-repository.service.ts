@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Tag } from '../../interfaces/tag.model';
+import { Dependency } from '../../interfaces/dependency.model';
 import { EndPoints, ApiAddresses } from '../enums.model';
 import { RequestHelperService } from './request-helper.service'
 
@@ -41,6 +42,12 @@ export class TagRepositoryService {
   public deleteTag = (tag: Tag) => {
     return this.http.delete<number>(
       this.request.createCompleteRoute(ApiAddresses.Tag, '', tag.IdTag)
+    );
+  }
+
+  public getDependencies = (tag: Tag) => {
+    return this.http.get<Dependency[]>(
+      this.request.createCompleteRoute(ApiAddresses.Tag, EndPoints.Dependency, tag.IdTag)
     );
   }
 }

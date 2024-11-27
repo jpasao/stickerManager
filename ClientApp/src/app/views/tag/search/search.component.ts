@@ -1,15 +1,18 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+
 import { cilPencil, cilTrash } from '@coreui/icons';
 import { CardComponent, CardHeaderComponent, CardBodyComponent, ButtonDirective, TableDirective, RowComponent, ColComponent, FormDirective, FormLabelDirective, FormControlDirective } from '@coreui/angular';
-import { Tag } from './../../../interfaces/tag.model';
-import { DefaultValuesService } from '../../../shared/default-values.service';
-import { TagRepositoryService } from './../../../shared/services/tag-repository.service'  
 import { IconDirective } from '@coreui/icons-angular';
-import { colorClasses } from '../../../shared/enums.model';
+
+import { DefaultValuesService } from '../../../shared/default-values.service';
+import { TagRepositoryService } from './../../../shared/services/tag-repository.service'
+import { Tag } from './../../../interfaces/tag.model';
+import { ColorClasses, ResponseTypes } from '../../../shared/enums.model';
+import { ToastModel } from '../../../interfaces/toast.model';
 import { ToastMessageComponent } from '../../../components/toast/toast-message.component';
 import { ModalMessageComponent } from '../../../components/modal/modal-message.component';
-import { ToastModel } from '../../../interfaces/toast.model';
 
 @Component({
   selector: 'app-search',
@@ -35,7 +38,8 @@ export class SearchComponent implements OnInit {
   constructor(
     private repository: TagRepositoryService, 
     private defaults: DefaultValuesService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -58,7 +62,7 @@ export class SearchComponent implements OnInit {
     this.tagForm.reset();
   }
   onEdit(tag: Tag) {
-
+    this.router.navigate(['/tags/save'], { state: tag });
   }
 
   openDeleteModal(tag: Tag) {
@@ -76,15 +80,15 @@ export class SearchComponent implements OnInit {
 
   onDelete(tagToDelete: Tag) {
     let message: string = 'La etiqueta se ha borrado correctamente';
-    let color: string = colorClasses.info;
+    let color: string = ColorClasses.info;
     this.repository
       .deleteTag(tagToDelete)
       .subscribe(response => {
-        if (response > 0) {
+        if (response > ResponseTypes.NO_CHANGE) {
           this.getTags();
         } else {
           message = 'ha habido un problema al borrar la etiqueta';
-          color = colorClasses.warning;
+          color = ColorClasses.warning;
         }
         const toast: ToastModel = this.defaults.ToastObject(message, color);
         ({ toastColor: this.toastColor, autohide: this.toastAutohide, toastMessage: this.toastMessage } = toast);
@@ -92,7 +96,7 @@ export class SearchComponent implements OnInit {
       })
   }
 
-  private getTags = (tag: Tag = this.defaults.tagObject) => {    
+  private getTags = (tag: Tag = this.defaults.tagObject()) => {    
     this.repository
       .getTags(tag)
       .subscribe(response => {

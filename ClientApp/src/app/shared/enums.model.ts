@@ -4,6 +4,7 @@ export enum EndPoints {
     Sticker = 'Sticker',
     Tag = 'Tag',
     Overview = 'Overview',
+    Dependency = 'Dependency',
 }
 export enum ApiAddresses {
     Tag = 'Tag',
@@ -11,8 +12,12 @@ export enum ApiAddresses {
     Image = 'Image',
     Dashboard = 'Dashboard',
 }
-export enum colorClasses {
+export enum ColorClasses {
     info = 'info',   
     warning = 'warning',
     danger = 'danger',    
+}
+export enum ResponseTypes {
+    NO_CHANGE = 0,
+    SOME_CHANGES = 1
 }
