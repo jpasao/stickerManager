@@ -15,6 +15,12 @@
 .select-week .calendar-row.current {
   cursor: pointer;
 }
+.alignRight {
+  float: right;
+}
+.pagination li:not(.active):not(.disabled) {
+  cursor: pointer;
+}
 // Validation
 .ng-invalid .ng-touched,
 form.ng-submitted .ng-invalid  {

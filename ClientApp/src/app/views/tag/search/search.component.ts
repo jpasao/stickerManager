@@ -1,23 +1,40 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { NgIf } from '@angular/common';
 
 import { cilPencil, cilTrash } from '@coreui/icons';
-import { CardComponent, CardHeaderComponent, CardBodyComponent, ButtonDirective, TableDirective, RowComponent, ColComponent, FormDirective, FormLabelDirective, FormControlDirective } from '@coreui/angular';
+import { 
+  CardComponent, CardHeaderComponent, CardBodyComponent, 
+  ButtonDirective, 
+  TableDirective, 
+  RowComponent, ColComponent, 
+  FormDirective, FormLabelDirective, FormControlDirective 
+} from '@coreui/angular';
 import { IconDirective } from '@coreui/icons-angular';
+import { ToastrService } from 'ngx-toastr';
 
-import { DefaultValuesService } from '../../../shared/default-values.service';
-import { TagRepositoryService } from './../../../shared/services/tag-repository.service'
+import { DefaultValuesService } from '../../../shared/services/default-values.service';
+import { TagRepositoryService } from '../../../shared/services/network/tag-repository.service'
+import { ResponseTypes } from '../../../shared/enums.model';
 import { Tag } from './../../../interfaces/tag.model';
-import { ColorClasses, ResponseTypes } from '../../../shared/enums.model';
-import { ToastModel } from '../../../interfaces/toast.model';
-import { ToastMessageComponent } from '../../../components/toast/toast-message.component';
 import { ModalMessageComponent } from '../../../components/modal/modal-message.component';
+import { GridPagerComponent } from '../../../components/grid-pager/grid-pager.component';
 
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [CardComponent, CardHeaderComponent, CardBodyComponent, ButtonDirective, TableDirective, RowComponent, ColComponent, FormDirective, FormLabelDirective, FormControlDirective, FormsModule, ReactiveFormsModule, IconDirective, ToastMessageComponent, ModalMessageComponent],
+  imports: [
+    CardComponent, CardHeaderComponent, CardBodyComponent, 
+    ButtonDirective, 
+    TableDirective, 
+    RowComponent, ColComponent, 
+    FormDirective, FormLabelDirective, FormControlDirective, FormsModule, ReactiveFormsModule, 
+    IconDirective, 
+    ModalMessageComponent, 
+    GridPagerComponent, 
+    NgIf
+  ],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss'
 })
@@ -27,24 +44,29 @@ export class SearchComponent implements OnInit {
   tagForm!: FormGroup;
   submitted = false;
   actionIcons = { cilPencil, cilTrash };
-  @ViewChild(ToastMessageComponent) toastComponent!: ToastMessageComponent;
   @ViewChild(ModalMessageComponent) modalComponent!: ModalMessageComponent;
-  toastColor: string = '';
-  toastAutohide: boolean = true;
-  toastMessage: string = '';
   modalTitle: string = '';
   modalMessage: string = '';
+  currentPage: number = 1;
+  itemsPerPage: number = 10;
+  pagedItems: Tag[] = [];
+  showPager: boolean = false;
+  itemsPerTable: number[] = [];
 
   constructor(
     private repository: TagRepositoryService, 
     private defaults: DefaultValuesService,
     private formBuilder: FormBuilder,
-    private router: Router
+    private router: Router,
+    private toast: ToastrService
   ) { }
 
   ngOnInit(): void {
     this.tagForm = this.formBuilder.group({ name: [""] });
-    this.getTags();    
+    this.getTags();
+    this.currentPage = 1;
+    this.itemsPerTable = this.defaults.ItemsPerTable;
+    this.itemsPerPage = this.defaults.GetItemsPerPage();
   }
 
    get form() { return this.tagForm.controls; }
@@ -79,28 +101,55 @@ export class SearchComponent implements OnInit {
   }
 
   onDelete(tagToDelete: Tag) {
-    let message: string = 'La etiqueta se ha borrado correctamente';
-    let color: string = ColorClasses.info;
+    let message: string = `La etiqueta ${tagToDelete.TagName} se ha borrado correctamente`;
+    const toatsTitle = 'Borrando etiquetas';
+
     this.repository
       .deleteTag(tagToDelete)
       .subscribe(response => {
         if (response > ResponseTypes.NO_CHANGE) {
+          if ((this.tags.length - 1) % this.itemsPerPage === 0) {
+            this.currentPage = 1;
+          }
+          this.toast.success(message, toatsTitle);
           this.getTags();
         } else {
-          message = 'ha habido un problema al borrar la etiqueta';
-          color = ColorClasses.warning;
+          message = `Ha habido un problema al borrar la etiqueta ${tagToDelete.TagName}`;
+          this.toast.warning(message, toatsTitle);
         }
-        const toast: ToastModel = this.defaults.ToastObject(message, color);
-        ({ toastColor: this.toastColor, autohide: this.toastAutohide, toastMessage: this.toastMessage } = toast);
-        this.toastComponent.toggleToast();
       })
   }
 
-  private getTags = (tag: Tag = this.defaults.tagObject()) => {    
+  private getTags = (tag: Tag = this.defaults.TagObject()) => {    
     this.repository
       .getTags(tag)
       .subscribe(response => {
         this.tags = response;
+        this.pagedItems = this.defaults.GetPagedItems(this.tags, this.currentPage, this.itemsPerPage);
+        this.showPager = this.tags.length > this.itemsPerPage;
       });
+  }
+
+  handlePageChange(event: number) {
+    if (event) {
+      this.currentPage = event;
+      this.setPager();
+    }
+  }
+
+  handleChangeTableRows(event: any) {
+    let receivedItemsPerPage = event?.target?.value;
+    if (isNaN(receivedItemsPerPage)) {
+      receivedItemsPerPage = 10;
+    }
+    this.currentPage = 1;
+    this.defaults.SaveItemsPerPage(receivedItemsPerPage.toString());
+    this.itemsPerPage = receivedItemsPerPage;
+    this.setPager();
+  }
+  
+  setPager() {
+    this.pagedItems = this.defaults.GetPagedItems(this.tags, this.currentPage, this.itemsPerPage);
+    this.showPager = this.tags.length > this.itemsPerPage;
   }
 }

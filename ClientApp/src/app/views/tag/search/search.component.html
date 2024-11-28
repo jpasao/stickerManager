@@ -23,7 +23,18 @@
 </c-card>
 <br />
 <c-card>
-  <c-card-header>Resultados</c-card-header>
+  <c-card-header>
+    Resultados
+    <label class="alignRight">
+      <select (change)="handleChangeTableRows($event)" value="itemsPerPage">
+        @for(item of itemsPerTable; track item) {
+          <option>
+            {{item}}
+          </option>
+        }
+      </select>
+    </label>
+  </c-card-header>
   <c-card-body>
     <table cTable hover stripped bordered>
       <thead >
@@ -33,7 +44,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (tag of tags; track tag.IdTag) {
+        @for (tag of pagedItems; track tag.IdTag) {
           <tr>
             <td>{{tag.TagName}}</td>
             <td>
@@ -48,7 +59,7 @@
         }
       </tbody>
     </table>
+    <app-grid-pager *ngIf="showPager" [itemsPerPage]="itemsPerPage" [totalItems]="tags.length" [currentPage]="currentPage" (pageNumber)="handlePageChange($event)"></app-grid-pager>
   </c-card-body>
 </c-card>
 <app-modal [title]="modalTitle" [message]="modalMessage" (dialogResponse)="handleDeleteModalResponse($event)"></app-modal>
-<app-toast [colorClass]="toastColor" [message]="toastMessage" [autohide]="toastAutohide"></app-toast>

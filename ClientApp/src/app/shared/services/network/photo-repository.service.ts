@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Sticker } from '../../interfaces/sticker.model'; 
-import { Photo } from '../../interfaces/photo.model';
-import { ApiAddresses } from '../enums.model';
+import { Sticker } from '../../../interfaces/sticker.model'; 
+import { Photo } from '../../../interfaces/photo.model';
+import { ApiAddresses } from '../../enums.model';
 import { RequestHelperService } from './request-helper.service';
 
 @Injectable({

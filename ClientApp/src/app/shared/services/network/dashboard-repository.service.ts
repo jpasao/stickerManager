@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Dashboard } from '../../interfaces/dashboard.model'; 
-import { EndPoints, ApiAddresses } from '../enums.model';
+import { Dashboard } from '../../../interfaces/dashboard.model'; 
+import { EndPoints, ApiAddresses } from '../../enums.model';
 import { RequestHelperService } from './request-helper.service';
 
 @Injectable({

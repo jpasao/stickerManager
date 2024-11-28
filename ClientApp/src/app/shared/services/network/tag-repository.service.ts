@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Tag } from '../../interfaces/tag.model';
-import { Dependency } from '../../interfaces/dependency.model';
-import { EndPoints, ApiAddresses } from '../enums.model';
+import { Tag } from '../../../interfaces/tag.model';
+import { Dependency } from '../../../interfaces/dependency.model';
+import { EndPoints, ApiAddresses } from '../../enums.model';
 import { RequestHelperService } from './request-helper.service'
 
 @Injectable({
