@@ -6,7 +6,8 @@ import { NgIf } from '@angular/common';
 import { cilPencil, cilTrash } from '@coreui/icons';
 import { 
   CardComponent, CardHeaderComponent, CardBodyComponent, 
-  ButtonDirective, 
+  ButtonDirective,
+  FormSelectDirective,
   TableDirective, 
   RowComponent, ColComponent, 
   FormDirective, FormLabelDirective, FormControlDirective 
@@ -15,7 +16,7 @@ import { IconDirective } from '@coreui/icons-angular';
 import { ToastrService } from 'ngx-toastr';
 
 import { DefaultValuesService } from '../../../shared/services/default-values.service';
-import { TagRepositoryService } from '../../../shared/services/network/tag-repository.service'
+import { TagRepositoryService } from '../../../shared/services/network/tag-repository.service';
 import { ResponseTypes } from '../../../shared/enums.model';
 import { Tag } from './../../../interfaces/tag.model';
 import { ModalMessageComponent } from '../../../components/modal/modal-message.component';
@@ -27,6 +28,7 @@ import { GridPagerComponent } from '../../../components/grid-pager/grid-pager.co
   imports: [
     CardComponent, CardHeaderComponent, CardBodyComponent, 
     ButtonDirective, 
+    FormSelectDirective,
     TableDirective, 
     RowComponent, ColComponent, 
     FormDirective, FormLabelDirective, FormControlDirective, FormsModule, ReactiveFormsModule, 
@@ -52,7 +54,7 @@ export class SearchComponent implements OnInit {
   pagedItems: Tag[] = [];
   showPager: boolean = false;
   itemsPerTable: number[] = [];
-
+  
   constructor(
     private repository: TagRepositoryService, 
     private defaults: DefaultValuesService,
@@ -69,7 +71,7 @@ export class SearchComponent implements OnInit {
     this.itemsPerPage = this.defaults.GetItemsPerPage();
   }
 
-   get form() { return this.tagForm.controls; }
+  get form() { return this.tagForm.controls; }
 
   onSubmit() {
     this.submitted = true;
@@ -86,10 +88,9 @@ export class SearchComponent implements OnInit {
   onEdit(tag: Tag) {
     this.router.navigate(['/tags/save'], { state: tag });
   }
-
   openDeleteModal(tag: Tag) {
     this.tagToHandle = tag;
-    this.modalTitle = 'Borrar etiqueta';
+    this.modalTitle = 'Borrando etiqueta';
     this.modalMessage = `Vas a borrar la etiqueta ${tag.TagName}. ¿Estás segura?`;
     this.modalComponent.toggleModal();
   }
@@ -99,10 +100,9 @@ export class SearchComponent implements OnInit {
       this.onDelete(this.tagToHandle);
     }
   }
-
   onDelete(tagToDelete: Tag) {
     let message: string = `La etiqueta ${tagToDelete.TagName} se ha borrado correctamente`;
-    const toatsTitle = 'Borrando etiquetas';
+    const toatsTitle = 'Borrando etiqueta';
 
     this.repository
       .deleteTag(tagToDelete)
@@ -117,9 +117,8 @@ export class SearchComponent implements OnInit {
           message = `Ha habido un problema al borrar la etiqueta ${tagToDelete.TagName}`;
           this.toast.warning(message, toatsTitle);
         }
-      })
+      });
   }
-
   private getTags = (tag: Tag = this.defaults.TagObject()) => {    
     this.repository
       .getTags(tag)
@@ -129,14 +128,12 @@ export class SearchComponent implements OnInit {
         this.showPager = this.tags.length > this.itemsPerPage;
       });
   }
-
   handlePageChange(event: number) {
     if (event) {
       this.currentPage = event;
       this.setPager();
     }
   }
-
   handleChangeTableRows(event: any) {
     let receivedItemsPerPage = event?.target?.value;
     if (isNaN(receivedItemsPerPage)) {
@@ -147,7 +144,6 @@ export class SearchComponent implements OnInit {
     this.itemsPerPage = receivedItemsPerPage;
     this.setPager();
   }
-  
   setPager() {
     this.pagedItems = this.defaults.GetPagedItems(this.tags, this.currentPage, this.itemsPerPage);
     this.showPager = this.tags.length > this.itemsPerPage;

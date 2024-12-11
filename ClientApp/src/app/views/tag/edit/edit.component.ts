@@ -98,7 +98,7 @@ export class EditComponent implements OnInit {
 
   handleResponse(result: number) {
     let message: string = `La etiqueta ${this.form['name'].value} se ha guardado correctamente`;
-    const toatsTitle = 'Guardado etiquetas';
+    const toatsTitle = 'Guardando etiqueta';
     
     if (result < ResponseTypes.SOME_CHANGES) {
       message = `Ha habido un problema al editar la etiqueta ${this.form['name'].value}`;

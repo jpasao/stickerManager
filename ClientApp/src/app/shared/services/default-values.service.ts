@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Tag } from '../../interfaces/tag.model'
+import { Sticker } from '../../interfaces/sticker.model';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +10,13 @@ export class DefaultValuesService {
     return {
       IdTag: 0,
       TagName: ''
+    }
+  }
+  public StickerObject = (): Sticker => {
+    return {
+      IdSticker: 0,
+      StickerName: '',
+      Tag: [this.TagObject()]
     }
   }
   public ItemsPerTable = [5, 10, 20, 50, 100];

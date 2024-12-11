@@ -24,7 +24,7 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
                     T.TagName
                 FROM stickers S 
                     LEFT JOIN stickertags ST ON ST.IdSticker = S.IdSticker
-                    INNER JOIN tags T ON T.IdTag = ST.IdTag
+                    LEFT JOIN tags T ON T.IdTag = ST.IdTag
                 WHERE (@NoTags = 1 OR T.IdTag IN @TagIdList) AND
                     (@StickerName = '' OR S.StickerName LIKE CONCAT('%', @StickerName, '%'))
                 ORDER BY S.StickerName";
@@ -54,10 +54,13 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
                 {
                     var groupedSticker = g.First();
                     groupedSticker.Tag = g.Select(tag => tag.Tag.Single()).ToList();
+
+                    if (groupedSticker.Tag[0] != null) {
                     groupedSticker.Tag = groupedSticker.Tag
                         .GroupBy(tag => tag.IdTag)
                         .Select(tag => tag.First())
                         .ToList();
+                    }
 
                     return groupedSticker;
                 }).AsList();
@@ -79,7 +82,7 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
             var sql = isNewSticker ?
                 "INSERT INTO stickers (StickerName) VALUES (@StickerName); SELECT LAST_INSERT_ID()" :
                 "UPDATE stickers SET StickerName = @StickerName WHERE IdSticker = @IdSticker";
-            
+
             stickerSave = await db.ExecuteScalarAsync<int>(sql, new 
             {
                 sticker.IdSticker,
@@ -93,17 +96,20 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
                 if (!isNewSticker)
                 {
                     sql = "DELETE FROM stickertags WHERE IdSticker = @IdSticker";
-                    stickerTagDelete = await db.ExecuteAsync(sql, sticker).ConfigureAwait(false);
+                    stickerTagDelete = await db.ExecuteAsync(sql, sticker).ConfigureAwait(true);
                 }
 
                 sql = "INSERT INTO stickertags (IdTag, IdSticker) VALUES (@IdTag, @IdSticker)";
                 sticker.Tag.ForEach(async tag => 
                 {
-                    stickerTagInsert = await db.ExecuteAsync(sql, new 
+                    var operation = db.ExecuteAsync(sql, new 
                     {
                         tag.IdTag,
                         IdSticker = stickerId
-                    }).ConfigureAwait(false);
+                    });
+                    operation.ConfigureAwait(false);
+                    stickerTagInsert = await operation;
+                    operation.Dispose();
                 });                
             }
 

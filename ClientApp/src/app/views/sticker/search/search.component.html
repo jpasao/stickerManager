@@ -1,1 +1,118 @@
-<p>search sticker works!</p>
+<c-card>
+    <c-card-header>
+      <c-row class="justify-content-between align-items-center">
+        <c-col xs="8" md="1"><span>Filtros</span></c-col>
+        <c-col xs="4" md="1"><button cButton type="reset" color="secondary" variant="outline" (click)="onReset()">Limpiar</button></c-col>
+      </c-row>
+    </c-card-header>
+    <c-card-body>
+      <form cForm (ngSubmit)="onSubmit()" [formGroup]="stickerForm">
+        <c-row gutter="3" class="align-items-center">
+          <c-col xs="3" md="1">
+            <label cLabel class="col" for="name">Nombre</label>
+          </c-col>
+          <c-col xs="9" md="5">
+            <input cFormControl type="text" formControlName="name" />
+          </c-col>
+          <c-col xs="3" md="1">
+            <label cLabel class="col" for="name">Etiquetas</label>
+          </c-col>
+          <c-col xs="9" md="4">
+            <select cSelect formControlName="tag" multiple>
+                <option>Elije una:</option>
+                @for(tag of tags; track tag.IdTag) {
+                    <option value="{{tag.IdTag}}">{{tag.TagName}}</option>
+                }
+            </select>
+          </c-col>
+          <c-col xs="12" md="1">
+            <button cButton type="submit" class="float-end">Buscar</button>
+          </c-col>
+        </c-row>
+      </form>
+    </c-card-body>
+  </c-card>
+  <br />
+  <c-card>
+    <c-card-header>
+      Resultados
+      <label class="alignRight">
+        <select cSelect (change)="handleChangeTableRows($event)" value="itemsPerPage">
+          @for(item of itemsPerTable; track item) {
+            <option>
+              {{item}}
+            </option>
+          }
+        </select>
+      </label>
+    </c-card-header>
+    <c-card-body>
+      <c-row>
+        <c-col>
+          <table cTable hover stripped bordered>
+            <thead>
+              <tr>
+                <th class="bg-body-tertiary col-md-9">Nombre</th>
+                <th class="bg-body-tertiary col-md-3">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (sticker of pagedItems; track sticker.IdSticker) {
+                <tr [cTableColor]="getRowColor(sticker)">
+                  <td>{{sticker.StickerName}}</td>
+                  <td>
+                    <button cButton color="info" variant="ghost" (click)="openDetail(sticker)">
+                      <svg [cIcon]="actionIcons.cilFeaturedPlaylist"></svg>
+                    </button>
+                    <button cButton color="warning" variant="ghost" (click)="onEdit(sticker)">
+                      <svg [cIcon]="actionIcons.cilPencil"></svg>
+                    </button>
+                    <button cButton color="danger" variant="ghost" (click)="openDeleteModal(sticker)">
+                      <svg [cIcon]="actionIcons.cilTrash"></svg>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </c-col>
+        <c-col>
+          <table cTable bordered *ngIf="showDetails">
+            <thead>
+              <tr>
+                <th class="bg-body-tertiary">Detalles</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Etiquetas:
+                  <br/>
+                  @if (hasTags) {
+                    @for(tag of stickerToHandle.Tag; track tag?.IdTag) {
+                      <c-badge color="secondary" variant="outline" style="margin-right: 5px;">{{tag?.TagName}}</c-badge>
+                    }
+                  } 
+                  @else {
+                    <label>Aún no has definido ninguna etiqueta para {{stickerToHandle.StickerName}}</label>
+                  }
+                </td>
+              </tr>
+              <tr>
+                <td>Foto:
+                  <br/>
+                  @if (stickerImage === '') {
+                    <label>Esta pegatina aún no tiene foto.</label>&nbsp;<a href="#" color="link" (click)="onEdit(stickerToHandle)">¿A qué esperas?</a>
+                  } 
+                  @else {
+                    <img cImg fluid [src]="stickerImage" />
+                  }
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </c-col>
+      </c-row>
+      <app-grid-pager *ngIf="showPager" [itemsPerPage]="itemsPerPage" [totalItems]="stickers.length" [currentPage]="currentPage" (pageNumber)="handlePageChange($event)"></app-grid-pager>
+    </c-card-body>
+  </c-card>
+  <app-modal [title]="modalTitle" [message]="modalMessage" (dialogResponse)="handleDeleteModalResponse($event)"></app-modal>

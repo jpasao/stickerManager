@@ -6,12 +6,18 @@
             </c-card-header>
             <c-card-body>
                 <form #customStylesForm="ngForm" cForm (ngSubmit)="onSubmit()" [formGroup]="tagEditForm" [validated]="formValidated" class="needs-validation" novalidate>
-                    <div class="mb-3">
-                        <label cLabel for="tagName">Nombre</label>
-                        <input cFormControl formControlName="name" type="text" required>
-                        <c-form-feedback [valid]="formValidated" *ngIf="!saving">¿Qué cosa fuera la etiqueta sin nombre?</c-form-feedback>
-                    </div>
-                    <input cButton color="primary" type="submit" value="Guardar">
+                    <c-row gutter="3" class="align-items-center">
+                        <c-col xs="3" md="2">
+                            <label cLabel for="tagName">Nombre</label>
+                        </c-col>
+                        <c-col xs="9" md="8">
+                            <input cFormControl formControlName="name" type="text" required>
+                            <c-form-feedback [valid]="formValidated" *ngIf="!saving">¿Qué cosa fuera la etiqueta sin nombre?</c-form-feedback>
+                        </c-col>
+                        <c-col xs="12" md="2">
+                            <input cButton color="primary" type="submit" value="Guardar" class="alignRight">
+                        </c-col>
+                    </c-row> 
                 </form>
             </c-card-body>
         </c-card>
@@ -22,7 +28,9 @@
             <c-card-body>
                 <table cTable hover stripped bordered *ngIf="dependencies && dependencies.length">
                     <thead>
-                        <th class="bg-body-tertiary">Nombre</th>
+                        <tr>
+                            <th class="bg-body-tertiary">Nombre</th>
+                        </tr>
                     </thead>
                     <tbody>
                         @for (dep of dependencies; track dep.Name) {

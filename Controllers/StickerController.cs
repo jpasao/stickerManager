@@ -29,7 +29,7 @@ public class StickerController : ControllerBase
         return await repository.SaveSticker(sticker);
     }
 
-    [HttpPost("Put")]
+    [HttpPut]
     public async Task<IResult> Put(Sticker sticker)
     {
         return await repository.SaveSticker(sticker);

@@ -2,7 +2,7 @@
   <c-card-header>
     <c-row class="justify-content-between align-items-center">
       <c-col xs="8" md="1"><span>Filtros</span></c-col>
-      <c-col xs="4" md="1"><button cButton type="reset" color="secondary" (click)="onReset()">Limpiar</button></c-col>
+      <c-col xs="4" md="1"><button cButton type="reset" color="secondary" variant="outline" (click)="onReset()">Limpiar</button></c-col>
     </c-row>
   </c-card-header>
   <c-card-body>
@@ -26,7 +26,7 @@
   <c-card-header>
     Resultados
     <label class="alignRight">
-      <select (change)="handleChangeTableRows($event)" value="itemsPerPage">
+      <select cSelect (change)="handleChangeTableRows($event)" value="itemsPerPage">
         @for(item of itemsPerTable; track item) {
           <option>
             {{item}}
