@@ -15,6 +15,7 @@ import {
 } from '@coreui/angular';
 import { IconDirective } from '@coreui/icons-angular';
 import { ToastrService } from 'ngx-toastr';
+import { Select2Module, Select2Data, Select2UpdateEvent } from 'ng-select2-component';
 
 import { DefaultValuesService } from '../../../shared/services/default-values.service';
 import { StickerRepositoryService } from '../../../shared/services/network/sticker-repository.service'
@@ -40,15 +41,16 @@ import { GridPagerComponent } from '../../../components/grid-pager/grid-pager.co
     IconDirective, 
     ModalMessageComponent, 
     GridPagerComponent, 
-    NgIf
+    NgIf,
+    Select2Module
   ],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss'
 })
 export class SearchComponent implements OnInit {
   stickers: Sticker[] = [];
-  tags: Tag[] = [];
-  stickerToHandle!: Sticker;
+  tags: Select2Data = [];
+  stickerToHandle: Sticker = this.defaults.StickerObject();
   stickerForm!: FormGroup;
   submitted = false;
   actionIcons = { cilPencil, cilTrash, cilFeaturedPlaylist };
@@ -87,6 +89,8 @@ export class SearchComponent implements OnInit {
 
   onSubmit() {
     this.submitted = true;
+    this.showDetails = false;
+    this.stickerToHandle.IdSticker = 0;
     const selectedTags = this.form['tag'].value;
     let tagObject: Tag[] = [this.defaults.TagObject()];
     if (selectedTags) {
@@ -167,7 +171,12 @@ export class SearchComponent implements OnInit {
     this.tagRepository
       .getTags(this.defaults.TagObject())
       .subscribe(response => {
-        this.tags = response;
+        this.tags = response.map((tag) => {
+          return {
+            value: tag.IdTag,
+            label: tag.TagName
+          }
+        });
       });
   }
   handlePageChange(event: number) {
@@ -193,5 +202,26 @@ export class SearchComponent implements OnInit {
   getRowColor(sticker: Sticker) {
     if (sticker === undefined || this.stickerToHandle === undefined) return '';
     return sticker.IdSticker === this.stickerToHandle.IdSticker ? 'info' : ''
+  }
+  handleCreateTag(event: Select2UpdateEvent<any>) {
+    if (event === null || event.value.length === 0) return;
+    const tagName = event.value.at(-1);
+    const tagToSave: Tag = {
+      IdTag: 0,
+      TagName: tagName
+    };
+    this.tagRepository
+      .createTag(tagToSave)
+      .subscribe(response => {
+        let message: string = `La etiqueta ${tagName} se ha guardado correctamente`;
+        const toatsTitle = 'Guardando etiqueta';
+        
+        if (response < ResponseTypes.SOME_CHANGES) {
+          message = `Ha habido un problema al crear la etiqueta ${tagName}`;
+          this.toast.warning(message, toatsTitle);
+        } else {
+          this.toast.success(message, toatsTitle);          
+        }
+      });
   }
 }

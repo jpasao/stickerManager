@@ -38,6 +38,7 @@
     "@coreui/utils": "^2.0.2",
     "chart.js": "^4.4.6",
     "lodash-es": "^4.17.21",
+    "ng-select2-component": "^16.0.0",
     "ngx-scrollbar": "^13.0.3",
     "ngx-toastr": "^19.0.0",
     "rxjs": "~7.8.1",
