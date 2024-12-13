@@ -1,1 +1,39 @@
-<p>edit sticker works!</p>
+<c-row>
+    <c-col>
+        <c-card>
+            <c-card-header>
+                {{savePlaceholder}} pegatina
+            </c-card-header>
+            <c-card-body>
+                <form #customStylesForm="ngForm" cForm (ngSubmit)="onSubmit()" [formGroup]="stickerEditForm" [validated]="formValidated" class="needs-validation" novalidate>
+                    <c-row gutter="3" class="align-items-center">
+                        <c-col xs="3" md="auto">
+                          <label cLabel class="col" for="name">Nombre</label>
+                        </c-col>
+                        <c-col xs="9" md="5">
+                          <input cFormControl type="text" formControlName="name" />
+                          <c-form-feedback [valid]="formValidated" *ngIf="!saving">¿Y cómo vas a buscar luego la pegatina?</c-form-feedback>
+                        </c-col>
+                        <c-col xs="3" md="auto">
+                          <label cLabel class="col" for="name">Etiquetas</label>
+                        </c-col>
+                        <c-col xs="9" md="4" class="tallSelectContainer">
+                          <select2 formControlName="tag" multiple="true"
+                            [data]="tags"  
+                            noResultMessage="Enter para crear una nueva etiqueta" 
+                            (autoCreateItem)="handleCreateTag($event)"
+                            [value]="stickerTags"
+                            resetSelectedValue=""
+                            autoCreate 
+                            resettable>
+                          </select2>
+                        </c-col>
+                        <c-col xs="12" md="1">
+                          <button cButton type="submit" class="float-end">Guardar</button>
+                        </c-col>
+                    </c-row>
+                </form>
+            </c-card-body>
+        </c-card>
+    </c-col>
+</c-row>

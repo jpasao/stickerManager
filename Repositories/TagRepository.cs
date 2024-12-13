@@ -35,12 +35,20 @@ public class TagRepository(IOptions<ConnectionString> connectionStrings) : ITagR
     {
         try
         {
-            var sql = (tag.IdTag == 0) ? 
-                "INSERT INTO tags (TagName) VALUES (@TagName)" : 
-                "UPDATE tags SET TagName = @TagName WHERE IdTag = @IdTag";
-            var response = await db.ExecuteAsync(sql, tag).ConfigureAwait(false);
+            int tagSave = 0;
+            string sql;
+            if (tag.IdTag == 0) 
+            {
+                sql = "INSERT INTO tags (TagName) VALUES (@TagName); SELECT LAST_INSERT_ID()";
+                tagSave = await db.ExecuteScalarAsync<int>(sql, tag).ConfigureAwait(false);
+            }
+            else 
+            {
+                sql = "UPDATE tags SET TagName = @TagName WHERE IdTag = @IdTag";
+                tagSave = await db.ExecuteAsync(sql, tag).ConfigureAwait(false);
+            }
 
-            return Response.BuildResponse(response);
+            return Response.BuildResponse(tagSave);
         }
         catch (UniqueException ex)
         {

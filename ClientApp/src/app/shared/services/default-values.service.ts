@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Tag } from '../../interfaces/tag.model'
 import { Sticker } from '../../interfaces/sticker.model';
+import { ErrorMessage } from '../../interfaces/error.model';
 
 @Injectable({
   providedIn: 'root'
@@ -37,6 +38,14 @@ export class DefaultValuesService {
       return  parseInt(defaultItems);
     }
     return parseInt(items);
+  }
+  public GetErrorMessage(err: any, operation: string, element: string): ErrorMessage {
+    const errorMessage: string = err.error.title || err.error.message || err.error;
+    const errorTitle = `Error al ${operation} la ${element}`;
+    return {
+      Title: errorTitle,
+      Message: errorMessage
+    };
   }
 
   constructor() { }

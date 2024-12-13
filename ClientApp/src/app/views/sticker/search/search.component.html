@@ -21,7 +21,7 @@
             <select2 formControlName="tag" multiple="true"
               [data]="tags"  
               noResultMessage="Enter para crear una nueva etiqueta" 
-              (update)="handleCreateTag($event)" 
+              (autoCreateItem)="handleCreateTag($event)" 
               resetSelectedValue=""
               autoCreate 
               resettable>
@@ -39,7 +39,7 @@
     <c-card-header>
       Resultados
       <label class="alignRight">
-        <select cSelect (change)="handleChangeTableRows($event)" value="itemsPerPage">
+        <select cSelect (change)="handleChangeTableRows($event)" [ngModel]="itemsPerPage">
           @for(item of itemsPerTable; track item) {
             <option>
               {{item}}

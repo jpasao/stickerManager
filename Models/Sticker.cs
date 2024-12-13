@@ -11,7 +11,7 @@ public class Sticker
 
     public required string StickerName  { get; set; }
 
-    public required List<Tag> Tag { get; set; }
+    public List<Tag>? Tag { get; set; }
 
     [JsonIgnore]
     public int[]? TagIdList { get; set; }

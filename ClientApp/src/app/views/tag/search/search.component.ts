@@ -91,7 +91,7 @@ export class SearchComponent implements OnInit {
   openDeleteModal(tag: Tag) {
     this.tagToHandle = tag;
     this.modalTitle = 'Borrando etiqueta';
-    this.modalMessage = `Vas a borrar la etiqueta ${tag.TagName}. ¿Estás segura?`;
+    this.modalMessage = `Vas a borrar la etiqueta '${tag.TagName}'. ¿Estás segura?`;
     this.modalComponent.toggleModal();
   }
   handleDeleteModalResponse(event: boolean) {
@@ -101,7 +101,7 @@ export class SearchComponent implements OnInit {
     }
   }
   onDelete(tagToDelete: Tag) {
-    let message: string = `La etiqueta ${tagToDelete.TagName} se ha borrado correctamente`;
+    let message: string = `La etiqueta '${tagToDelete.TagName}' se ha borrado correctamente`;
     const toatsTitle = 'Borrando etiqueta';
 
     this.repository
@@ -114,7 +114,7 @@ export class SearchComponent implements OnInit {
           this.toast.success(message, toatsTitle);
           this.getTags();
         } else {
-          message = `Ha habido un problema al borrar la etiqueta ${tagToDelete.TagName}`;
+          message = `Ha habido un problema al borrar la etiqueta '${tagToDelete.TagName}'`;
           this.toast.warning(message, toatsTitle);
         }
       });

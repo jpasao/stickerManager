@@ -19,7 +19,8 @@ import { DefaultValuesService } from '../../../shared/services/default-values.se
 import { TagRepositoryService } from '../../../shared/services/network/tag-repository.service';
 import { Tag } from '../../../interfaces/tag.model';
 import { Dependency } from '../../../interfaces/dependency.model';
-import { ResponseTypes } from '../../../shared/enums.model';
+import { Entities, Operations, ResponseTypes } from '../../../shared/enums.model';
+import { ErrorMessage } from '../../../interfaces/error.model';
 
 @Component({
   selector: 'app-edit',
@@ -84,24 +85,36 @@ export class EditComponent implements OnInit {
     if (this.isEditing) {
       this.repository
         .updateTag(tagToSave)
-        .subscribe(response => {
-          this.handleResponse(response)
+        .subscribe({
+          next: (response) => {
+            this.handleResponse(response)
+          },
+          error: (err) => {
+            const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.save, Entities.tag);
+            this.toast.error(errorTexts.Message, errorTexts.Title);
+          }
         });
     } else {
       this.repository
         .createTag(tagToSave)
-        .subscribe(response => {
-          this.handleResponse(response)
+        .subscribe({
+          next: (response) => {
+            this.handleResponse(response)
+          },
+          error: (err) => {
+            const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.save, Entities.tag);
+            this.toast.error(errorTexts.Message, errorTexts.Title);
+          }
         });
     }
   }
 
   handleResponse(result: number) {
-    let message: string = `La etiqueta ${this.form['name'].value} se ha guardado correctamente`;
+    let message: string = `La etiqueta '${this.form['name'].value}' se ha guardado correctamente`;
     const toatsTitle = 'Guardando etiqueta';
     
     if (result < ResponseTypes.SOME_CHANGES) {
-      message = `Ha habido un problema al editar la etiqueta ${this.form['name'].value}`;
+      message = `Ha habido un problema al editar la etiqueta '${this.form['name'].value}'`;
       this.toast.warning(message, toatsTitle);
     } else {
       this.toast.success(message, toatsTitle);
@@ -115,5 +128,9 @@ export class EditComponent implements OnInit {
       .subscribe(response => {
         this.dependencies = response;
       })
+  }
+
+  getWidth() {
+    return this.isEditing ? '8' : '10';
   }
 }

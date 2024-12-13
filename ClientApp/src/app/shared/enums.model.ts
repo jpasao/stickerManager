@@ -19,5 +19,13 @@ export enum ColorClasses {
 }
 export enum ResponseTypes {
     NO_CHANGE = 0,
-    SOME_CHANGES = 1
+    SOME_CHANGES = 1,
+}
+export enum Operations {
+    get = 'obtener',
+    save = 'guardar',
+}
+export enum Entities {
+    sticker = 'pegatina',
+    tag = 'etiqueta',    
 }

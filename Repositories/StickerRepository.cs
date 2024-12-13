@@ -79,19 +79,30 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
         {
             bool isNewSticker = sticker.IdSticker == 0;
             int stickerSave = 0, stickerTagDelete = 0, stickerTagInsert = 0, stickerId = 0;
-            var sql = isNewSticker ?
-                "INSERT INTO stickers (StickerName) VALUES (@StickerName); SELECT LAST_INSERT_ID()" :
-                "UPDATE stickers SET StickerName = @StickerName WHERE IdSticker = @IdSticker";
 
-            stickerSave = await db.ExecuteScalarAsync<int>(sql, new 
+            string sql;
+            if (isNewSticker) 
             {
-                sticker.IdSticker,
-                sticker.StickerName
-            }).ConfigureAwait(false);
+                sql = "INSERT INTO stickers (StickerName) VALUES (@StickerName); SELECT LAST_INSERT_ID()";
+                stickerSave = await db.ExecuteScalarAsync<int>(sql, new 
+                {
+                    sticker.IdSticker,
+                    sticker.StickerName
+                }).ConfigureAwait(false);
+            }
+            else 
+            {
+                sql = "UPDATE stickers SET StickerName = @StickerName WHERE IdSticker = @IdSticker";
+                stickerSave = await db.ExecuteAsync(sql, new 
+                {
+                    sticker.IdSticker,
+                    sticker.StickerName
+                }).ConfigureAwait(false);
+            }
 
             stickerId = isNewSticker ? stickerSave : sticker.IdSticker;
 
-            if (sticker.Tag != null && sticker.Tag.Count > 0)
+            if (sticker.Tag != null && sticker.Tag.Count > 0 && sticker.Tag[0].IdTag != 0)
             {
                 if (!isNewSticker)
                 {
@@ -99,18 +110,13 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
                     stickerTagDelete = await db.ExecuteAsync(sql, sticker).ConfigureAwait(true);
                 }
 
+                using var connection = new MySqlConnection(connectionStrings.Value.StickerConnectionString);
                 sql = "INSERT INTO stickertags (IdTag, IdSticker) VALUES (@IdTag, @IdSticker)";
-                sticker.Tag.ForEach(async tag => 
-                {
-                    var operation = db.ExecuteAsync(sql, new 
-                    {
-                        tag.IdTag,
-                        IdSticker = stickerId
-                    });
-                    operation.ConfigureAwait(false);
-                    stickerTagInsert = await operation;
-                    operation.Dispose();
-                });                
+                var stickerTags = sticker.Tag.Select(obj => new {
+                    IdTag = obj.IdTag,
+                    IdSticker = sticker.IdSticker
+                });
+                stickerTagInsert = await connection.ExecuteAsync(sql, stickerTags);              
             }
 
             var response = stickerSave + stickerTagDelete + stickerTagInsert;

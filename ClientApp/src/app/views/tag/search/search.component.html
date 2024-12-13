@@ -26,7 +26,7 @@
   <c-card-header>
     Resultados
     <label class="alignRight">
-      <select cSelect (change)="handleChangeTableRows($event)" value="itemsPerPage">
+      <select cSelect (change)="handleChangeTableRows($event)" [ngModel]="itemsPerPage">
         @for(item of itemsPerTable; track item) {
           <option>
             {{item}}

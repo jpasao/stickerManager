@@ -21,11 +21,12 @@ import { DefaultValuesService } from '../../../shared/services/default-values.se
 import { StickerRepositoryService } from '../../../shared/services/network/sticker-repository.service'
 import { TagRepositoryService } from '../../../shared/services/network/tag-repository.service';
 import { PhotoRepositoryService } from '../../../shared/services/network/photo-repository.service';
-import { ResponseTypes } from '../../../shared/enums.model';
+import { Entities, Operations, ResponseTypes } from '../../../shared/enums.model';
 import { Sticker } from './../../../interfaces/sticker.model';
 import { Tag } from '../../../interfaces/tag.model';
 import { ModalMessageComponent } from '../../../components/modal/modal-message.component';
 import { GridPagerComponent } from '../../../components/grid-pager/grid-pager.component';
+import { ErrorMessage } from '../../../interfaces/error.model';
 
 @Component({
   selector: 'app-search',
@@ -130,7 +131,7 @@ export class SearchComponent implements OnInit {
   openDeleteModal(sticker: Sticker) {
     this.stickerToHandle = sticker;
     this.modalTitle = 'Borrando pegatina';
-    this.modalMessage = `Vas a borrar la pegatina ${sticker.StickerName}. ¿Estás segura?`;
+    this.modalMessage = `Vas a borrar la pegatina '${sticker.StickerName}'. ¿Estás segura?`;
     this.modalComponent.toggleModal();
   }
   handleDeleteModalResponse(event: boolean) {
@@ -140,7 +141,7 @@ export class SearchComponent implements OnInit {
     }
   }
   onDelete(stickerToDelete: Sticker) {
-    let message: string = `La pegatina ${stickerToDelete.StickerName} se ha borrado correctamente`;
+    let message: string = `La pegatina '${stickerToDelete.StickerName}' se ha borrado correctamente`;
     const toatsTitle = 'Borrando pegatina';
 
     this.stickerRepository
@@ -153,7 +154,7 @@ export class SearchComponent implements OnInit {
           this.toast.success(message, toatsTitle);
           this.getStickers();
         } else {
-          message = `Ha habido un problema al borrar la pegatina ${stickerToDelete.StickerName}`;
+          message = `Ha habido un problema al borrar la pegatina '${stickerToDelete.StickerName}'`;
           this.toast.warning(message, toatsTitle);
         }
       });
@@ -161,22 +162,34 @@ export class SearchComponent implements OnInit {
   private getStickers = (sticker: Sticker = this.defaults.StickerObject()) => {    
     this.stickerRepository
       .getStickers(sticker)
-      .subscribe(response => {
-        this.stickers = response;
-        this.pagedItems = this.defaults.GetPagedItems(this.stickers, this.currentPage, this.itemsPerPage);
-        this.showPager = this.stickers.length > this.itemsPerPage;
+      .subscribe({
+        next: (response) => {
+          this.stickers = response;
+          this.pagedItems = this.defaults.GetPagedItems(this.stickers, this.currentPage, this.itemsPerPage);
+          this.showPager = this.stickers.length > this.itemsPerPage;
+        },
+        error: (err) => {
+          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.get, Entities.sticker);
+          this.toast.error(errorTexts.Message, errorTexts.Title);
+        }
       });
   }
   private getTags = () => {
     this.tagRepository
       .getTags(this.defaults.TagObject())
-      .subscribe(response => {
-        this.tags = response.map((tag) => {
-          return {
-            value: tag.IdTag,
-            label: tag.TagName
-          }
-        });
+      .subscribe({
+        next: (response) => {
+          this.tags = response.map((tag) => {
+            return {
+              value: tag.IdTag,
+              label: tag.TagName
+            }
+          });
+        },
+        error: (err) => {
+          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.get, Entities.tag);
+          this.toast.error(errorTexts.Message, errorTexts.Title);
+        }
       });
   }
   handlePageChange(event: number) {
@@ -204,23 +217,29 @@ export class SearchComponent implements OnInit {
     return sticker.IdSticker === this.stickerToHandle.IdSticker ? 'info' : ''
   }
   handleCreateTag(event: Select2UpdateEvent<any>) {
-    if (event === null || event.value.length === 0) return;
-    const tagName = event.value.at(-1);
+    if (event === null || event.value.value.length === 0) return;
+    const tagName = event.value.value;
     const tagToSave: Tag = {
       IdTag: 0,
       TagName: tagName
     };
     this.tagRepository
       .createTag(tagToSave)
-      .subscribe(response => {
-        let message: string = `La etiqueta ${tagName} se ha guardado correctamente`;
-        const toatsTitle = 'Guardando etiqueta';
-        
-        if (response < ResponseTypes.SOME_CHANGES) {
-          message = `Ha habido un problema al crear la etiqueta ${tagName}`;
-          this.toast.warning(message, toatsTitle);
-        } else {
-          this.toast.success(message, toatsTitle);          
+      .subscribe({
+        next: (response) => {
+          let message: string = `La etiqueta '${tagName}' se ha guardado correctamente`;
+          const toatsTitle = 'Guardando etiqueta';
+          
+          if (response < ResponseTypes.SOME_CHANGES) {
+            message = `Ha habido un problema al crear la etiqueta '${tagName}'`;
+            this.toast.warning(message, toatsTitle);
+          } else {
+            this.toast.success(message, toatsTitle);          
+          }
+        },
+        error: (err) => {
+          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.save, Entities.tag);
+          this.toast.error(errorTexts.Message, errorTexts.Title);
         }
       });
   }
