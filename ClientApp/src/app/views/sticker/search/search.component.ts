@@ -14,7 +14,7 @@ import {
   BadgeComponent
 } from '@coreui/angular';
 import { IconDirective } from '@coreui/icons-angular';
-import { Select2Module, Select2Data, Select2UpdateEvent } from 'ng-select2-component';
+import { Select2Module, Select2UpdateEvent, Select2Option } from 'ng-select2-component';
 
 import { DefaultValuesService } from '../../../shared/services/default-values.service';
 import { StickerRepositoryService } from '../../../shared/services/network/sticker-repository.service'
@@ -50,7 +50,7 @@ import { ShowToastService } from '../../../shared/services/show-toast.service';
 })
 export class SearchComponent implements OnInit {
   stickers: Sticker[] = [];
-  tags: Select2Data = [];
+  tags: Select2Option[] = [];
   stickerToHandle: Sticker = this.defaults.StickerObject();
   stickerForm!: FormGroup;
   submitted = false;
@@ -229,12 +229,17 @@ export class SearchComponent implements OnInit {
         next: (response) => {
           let message: string = `La etiqueta '${tagName}' se ha guardado correctamente`;
           const toastTitle = 'Guardando etiqueta';
-          
+
           if (response < ResponseTypes.SOME_CHANGES) {
             message = `Ha habido un problema al crear la etiqueta '${tagName}'`;
             this.toast.show(toastTitle, message, ColorClasses.warning);
           } else {
             this.toast.show(toastTitle, message, ColorClasses.info);
+            this.tags.forEach(tag => {
+              if (tag.value === tagName) {
+                tag.value = response;
+              }
+            });
           }
         },
         error: (err) => {

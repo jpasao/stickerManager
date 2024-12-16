@@ -12,7 +12,7 @@ import {
   TextColorDirective,
   InputGroupComponent, InputGroupTextDirective,
 } from '@coreui/angular';
-import { Select2Module, Select2Data, Select2UpdateEvent } from 'ng-select2-component';
+import { Select2Module, Select2UpdateEvent, Select2Option } from 'ng-select2-component';
 
 import { InvalidDirective } from '../../../shared/invalid.directive';
 import { DefaultValuesService } from '../../../shared/services/default-values.service';
@@ -49,7 +49,7 @@ import { ShowToastService } from '../../../shared/services/show-toast.service';
 })
 export class EditComponent implements OnInit {
   receivedSticker: Sticker = this.defaults.StickerObject();
-  tags: Select2Data = [];
+  tags: Select2Option[] = [];
   stickerTags: number[] = [];
   stickerImage!: Photo;
   isEditing: boolean;
@@ -79,8 +79,8 @@ export class EditComponent implements OnInit {
     }
     this.isEditing = hasData;
     this.savePlaceholder = this.isEditing ? 'Editar' : 'Nueva';
-  } 
-  
+  }
+
   ngOnInit(): void {
     this.getTags();
     this.getPhoto();
@@ -126,6 +126,11 @@ export class EditComponent implements OnInit {
             message = `Ha habido un problema al crear la etiqueta '${tagName}'`;
             this.toast.show(toastTitle, message, ColorClasses.warning);
           } else {
+            this.tags.forEach(tag => {
+              if (tag.value === tagName) {
+                tag.value = response;
+              }
+            });
             this.toast.show(toastTitle, message, ColorClasses.info);
           }
         },
@@ -202,8 +207,12 @@ export class EditComponent implements OnInit {
       return;
     }
     const tagsToSave = tags[0].IdTag === undefined
-      ? tags.map((tag: number) => {
-        return { IdTag: tag, TagName: '' }
+      ? tags.map((tag: any) => {
+        let num = tag;
+        if (isNaN(parseInt(num.toString()))) {
+          num = this.tags.find(element => element.label === num)?.value;
+        }
+        return { IdTag: num, TagName: '' }
       })
       : [this.defaults.TagObject()];
     const stickerToSave: Sticker = {
