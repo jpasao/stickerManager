@@ -4,13 +4,13 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { NgIf } from '@angular/common';
 
 import { 
-  CardComponent, CardHeaderComponent, CardBodyComponent, ImgDirective, 
-  ButtonDirective, 
-  TableDirective, 
-  RowComponent, ColComponent, 
-  FormDirective, FormLabelDirective, FormControlDirective, FormFeedbackComponent, 
-  TextColorDirective, 
-  InputGroupComponent, InputGroupTextDirective 
+  CardComponent, CardHeaderComponent, CardBodyComponent, ImgDirective,
+  ButtonDirective,
+  TableDirective,
+  RowComponent, ColComponent,
+  FormDirective, FormLabelDirective, FormControlDirective, FormFeedbackComponent,
+  TextColorDirective,
+  InputGroupComponent, InputGroupTextDirective,
 } from '@coreui/angular';
 import { Select2Module, Select2Data, Select2UpdateEvent } from 'ng-select2-component';
 
@@ -32,14 +32,14 @@ import { ShowToastService } from '../../../shared/services/show-toast.service';
   selector: 'app-edit',
   standalone: true,
   imports: [
-    CardComponent, CardHeaderComponent, CardBodyComponent, ImgDirective, 
-    ButtonDirective, 
-    TableDirective, 
-    RowComponent, ColComponent, 
-    FormDirective, FormLabelDirective, FormControlDirective, FormsModule, ReactiveFormsModule, FormFeedbackComponent, 
-    TextColorDirective, 
-    InputGroupComponent, InputGroupTextDirective, 
-    InvalidDirective, 
+    CardComponent, CardHeaderComponent, CardBodyComponent, ImgDirective,
+    ButtonDirective,
+    TableDirective,
+    RowComponent, ColComponent,
+    FormDirective, FormLabelDirective, FormControlDirective, FormsModule, ReactiveFormsModule, FormFeedbackComponent,
+    TextColorDirective,
+    InputGroupComponent, InputGroupTextDirective,
+    InvalidDirective,
     NgIf,
     Select2Module,
     ModalMessageComponent,
@@ -66,7 +66,7 @@ export class EditComponent implements OnInit {
     private stickerRepository: StickerRepositoryService,
     private tagRepository: TagRepositoryService,
     private photoRepository: PhotoRepositoryService,
-    private router: Router, 
+    private router: Router,
     private defaults: DefaultValuesService,
     private formBuilder: FormBuilder,
     private toast: ShowToastService) {
@@ -87,7 +87,7 @@ export class EditComponent implements OnInit {
     this.stickerEditForm = this.formBuilder.group({ 
       name: [this.receivedSticker.StickerName, [Validators.required]],
       tag: [this.receivedSticker.Tag]
-      });   
+      });
   }
 
   get form() { return this.stickerEditForm.controls; }
@@ -121,7 +121,7 @@ export class EditComponent implements OnInit {
         next: (response) => {
           let message: string = `La etiqueta '${tagName}' se ha guardado correctamente`;
           const toastTitle = 'Guardando etiqueta';
-          
+
           if (response < ResponseTypes.SOME_CHANGES) {
             message = `Ha habido un problema al crear la etiqueta '${tagName}'`;
             this.toast.show(toastTitle, message, ColorClasses.warning);

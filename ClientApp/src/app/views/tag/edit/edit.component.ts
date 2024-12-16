@@ -4,13 +4,13 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { NgIf } from '@angular/common';
 
 import { 
-  CardComponent, CardHeaderComponent, CardBodyComponent, 
-  ButtonDirective, 
-  TableDirective, 
-  RowComponent, ColComponent, 
-  FormDirective, FormLabelDirective, FormControlDirective, FormFeedbackComponent, 
-  TextColorDirective, 
-  InputGroupComponent, InputGroupTextDirective 
+  CardComponent, CardHeaderComponent, CardBodyComponent,
+  ButtonDirective,
+  TableDirective,
+  RowComponent, ColComponent,
+  FormDirective, FormLabelDirective, FormControlDirective, FormFeedbackComponent,
+  TextColorDirective,
+  InputGroupComponent, InputGroupTextDirective
 } from '@coreui/angular';
 
 import { InvalidDirective } from '../../../shared/invalid.directive';
@@ -26,14 +26,14 @@ import { ShowToastService } from '../../../shared/services/show-toast.service';
   selector: 'app-edit',
   standalone: true,
   imports: [
-    CardComponent, CardHeaderComponent, CardBodyComponent, 
-    ButtonDirective, 
-    TableDirective, 
-    RowComponent, ColComponent, 
-    FormDirective, FormLabelDirective, FormControlDirective, FormsModule, ReactiveFormsModule, FormFeedbackComponent, 
-    TextColorDirective, 
-    InputGroupComponent, InputGroupTextDirective, 
-    InvalidDirective, 
+    CardComponent, CardHeaderComponent, CardBodyComponent,
+    ButtonDirective,
+    TableDirective,
+    RowComponent, ColComponent,
+    FormDirective, FormLabelDirective, FormControlDirective, FormsModule, ReactiveFormsModule, FormFeedbackComponent,
+    TextColorDirective,
+    InputGroupComponent, InputGroupTextDirective,
+    InvalidDirective,
     NgIf
   ],
   templateUrl: './edit.component.html',
@@ -66,7 +66,7 @@ export class EditComponent implements OnInit {
   } 
   
   ngOnInit(): void {
-    this.tagEditForm = this.formBuilder.group({ name: [this.receivedTag.TagName, [Validators.required]] });   
+    this.tagEditForm = this.formBuilder.group({ name: [this.receivedTag.TagName, [Validators.required]] });
   }
 
   get form() { return this.tagEditForm.controls; }
@@ -112,7 +112,7 @@ export class EditComponent implements OnInit {
   handleResponse(result: number) {
     let message: string = `La etiqueta '${this.form['name'].value}' se ha guardado correctamente`;
     const toastTitle = 'Guardando etiqueta';
-    
+
     if (result < ResponseTypes.SOME_CHANGES) {
       message = `Ha habido un problema al editar la etiqueta '${this.form['name'].value}'`;
       this.toast.show(toastTitle, message, ColorClasses.warning);

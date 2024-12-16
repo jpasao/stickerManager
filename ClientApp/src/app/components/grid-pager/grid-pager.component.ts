@@ -18,7 +18,7 @@ export class GridPagerComponent implements OnInit{
   pageNumber = output<number>();
   pageNumbers: number[] = [];
 
-  ngOnInit(): void { 
+  ngOnInit(): void {
     this.initializePageNumbers();
   }
 

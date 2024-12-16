@@ -17,24 +17,24 @@ export class TagRepositoryService {
 
   public getTags = (tag: Tag) => {
     return this.http.post<Tag[]>(
-      this.request.createCompleteRoute(ApiAddresses.Tag, EndPoints.Get), 
-      tag, 
+      this.request.createCompleteRoute(ApiAddresses.Tag, EndPoints.Get),
+      tag,
       this.request.generateHeaders()
     );
   }
 
   public createTag = (tag: Tag) => {
     return this.http.post<number>(
-      this.request.createCompleteRoute(ApiAddresses.Tag, EndPoints.Post), 
-      tag, 
+      this.request.createCompleteRoute(ApiAddresses.Tag, EndPoints.Post),
+      tag,
       this.request.generateHeaders()
     );
   }
 
   public updateTag = (tag: Tag) => {
     return this.http.put<number>(
-      this.request.createCompleteRoute(ApiAddresses.Tag, ''), 
-      tag, 
+      this.request.createCompleteRoute(ApiAddresses.Tag, ''),
+      tag,
       this.request.generateHeaders()
     );
   }

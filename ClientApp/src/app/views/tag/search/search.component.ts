@@ -5,12 +5,12 @@ import { NgIf } from '@angular/common';
 
 import { cilPencil, cilTrash } from '@coreui/icons';
 import { 
-  CardComponent, CardHeaderComponent, CardBodyComponent, 
+  CardComponent, CardHeaderComponent, CardBodyComponent,
   ButtonDirective,
   FormSelectDirective,
-  TableDirective, 
-  RowComponent, ColComponent, 
-  FormDirective, FormLabelDirective, FormControlDirective 
+  TableDirective,
+  RowComponent, ColComponent,
+  FormDirective, FormLabelDirective, FormControlDirective
 } from '@coreui/angular';
 import { IconDirective } from '@coreui/icons-angular';
 
@@ -26,15 +26,15 @@ import { ShowToastService } from '../../../shared/services/show-toast.service';
   selector: 'app-search',
   standalone: true,
   imports: [
-    CardComponent, CardHeaderComponent, CardBodyComponent, 
-    ButtonDirective, 
+    CardComponent, CardHeaderComponent, CardBodyComponent,
+    ButtonDirective,
     FormSelectDirective,
-    TableDirective, 
-    RowComponent, ColComponent, 
-    FormDirective, FormLabelDirective, FormControlDirective, FormsModule, ReactiveFormsModule, 
-    IconDirective, 
-    ModalMessageComponent, 
-    GridPagerComponent, 
+    TableDirective,
+    RowComponent, ColComponent,
+    FormDirective, FormLabelDirective, FormControlDirective, FormsModule, ReactiveFormsModule,
+    IconDirective,
+    ModalMessageComponent,
+    GridPagerComponent,
     NgIf
   ],
   templateUrl: './search.component.html',
@@ -119,7 +119,7 @@ export class SearchComponent implements OnInit {
         }
       });
   }
-  private getTags = (tag: Tag = this.defaults.TagObject()) => {    
+  private getTags = (tag: Tag = this.defaults.TagObject()) => {
     this.repository
       .getTags(tag)
       .subscribe(response => {

@@ -28,7 +28,7 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
                 WHERE (@NoTags = 1 OR T.IdTag IN @TagIdList) AND
                     (@StickerName = '' OR S.StickerName LIKE CONCAT('%', @StickerName, '%'))
                 ORDER BY S.StickerName";
-            
+
             var tagList = sticker.Tag.Select(t => t.IdTag).ToArray();
             sticker.TagIdList = tagList;
             sticker.NoTags = tagList[0] != 0 ? 0 : 1;
@@ -37,7 +37,7 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
                 {
                     sticker.Tag = new List<Tag>{ tag };
                     sticker.TagIdList = tagList;
-                    return sticker;                
+                    return sticker;
                 }, splitOn: "IdTag",
                 param: new
                 {
@@ -81,7 +81,7 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
             int stickerSave = 0, stickerTagDelete = 0, stickerTagInsert = 0, stickerId = 0;
 
             string sql;
-            if (isNewSticker) 
+            if (isNewSticker)
             {
                 sql = "INSERT INTO stickers (StickerName) VALUES (@StickerName); SELECT LAST_INSERT_ID()";
                 stickerSave = await db.ExecuteScalarAsync<int>(sql, new 
@@ -113,10 +113,10 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
                 using var connection = new MySqlConnection(connectionStrings.Value.StickerConnectionString);
                 sql = "INSERT INTO stickertags (IdTag, IdSticker) VALUES (@IdTag, @IdSticker)";
                 var stickerTags = sticker.Tag.Select(obj => new {
-                    IdTag = obj.IdTag,
-                    IdSticker = sticker.IdSticker
+                    obj.IdTag,
+                    sticker.IdSticker
                 });
-                stickerTagInsert = await connection.ExecuteAsync(sql, stickerTags);              
+                stickerTagInsert = await connection.ExecuteAsync(sql, stickerTags);
             }
 
             var response = stickerSave + stickerTagDelete + stickerTagInsert;

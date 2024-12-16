@@ -21,7 +21,7 @@ public class ImageRepository(IOptions<ConnectionString> connectionStrings) : IIm
                         FROM images
                         WHERE IdSticker = @IdSticker";
             var response = (await db.QueryAsync<Image>(sql, new { IdSticker = idSticker }).ConfigureAwait(false)).AsList();
-            
+
             return Response.BuildResponse(response);
         }
         catch (Exception ex)
@@ -50,7 +50,7 @@ public class ImageRepository(IOptions<ConnectionString> connectionStrings) : IIm
             DynamicParameters parameters = new DynamicParameters();
             parameters.Add("@IdSticker", idSticker);
             parameters.Add("@StickerImage", imageBytes, DbType.Binary, ParameterDirection.Input);
-            
+
             string sql = "INSERT INTO images (IdSticker, StickerImage) VALUES (@IdSticker, @StickerImage); SELECT LAST_INSERT_ID()";
             int response = await db.ExecuteScalarAsync<int>(sql, parameters).ConfigureAwait(false);
 
@@ -68,8 +68,8 @@ public class ImageRepository(IOptions<ConnectionString> connectionStrings) : IIm
         {
             var sql = "DELETE FROM images WHERE IdImage = @IdImage";
             var response = await db.ExecuteAsync(sql, 
-            new 
-            { 
+            new
+            {
                 IdImage = idImage 
             }).ConfigureAwait(false);
 

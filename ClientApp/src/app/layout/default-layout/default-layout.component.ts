@@ -40,9 +40,5 @@ import { navItems } from './_nav';
 export class DefaultLayoutComponent {
   public navItems = navItems;
 
-  onScrollbarUpdate($event: any) {
-    // if ($event.verticalUsed) {
-    // console.log('verticalUsed', $event.verticalUsed);
-    // }
-  }
+  onScrollbarUpdate($event: any) {  }
 }

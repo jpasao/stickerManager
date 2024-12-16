@@ -4,12 +4,12 @@ import { Router } from '@angular/router';
 import { NgIf } from '@angular/common';
 
 import { cilPencil, cilTrash, cilFeaturedPlaylist } from '@coreui/icons';
-import { 
-  CardComponent, CardHeaderComponent, CardBodyComponent, ImgDirective, 
+import {
+  CardComponent, CardHeaderComponent, CardBodyComponent, ImgDirective,
   ButtonDirective,
   FormSelectDirective,
-  TableDirective, TableColorDirective, 
-  RowComponent, ColComponent, 
+  TableDirective, TableColorDirective,
+  RowComponent, ColComponent,
   FormDirective, FormLabelDirective, FormControlDirective,
   BadgeComponent
 } from '@coreui/angular';
@@ -32,16 +32,16 @@ import { ShowToastService } from '../../../shared/services/show-toast.service';
   selector: 'app-search',
   standalone: true,
   imports: [
-    CardComponent, CardHeaderComponent, CardBodyComponent, ImgDirective, 
+    CardComponent, CardHeaderComponent, CardBodyComponent, ImgDirective,
     ButtonDirective,
     FormSelectDirective,
-    TableDirective, TableColorDirective, 
+    TableDirective, TableColorDirective,
     RowComponent, ColComponent, 
-    FormDirective, FormLabelDirective, FormControlDirective, FormsModule, ReactiveFormsModule, 
+    FormDirective, FormLabelDirective, FormControlDirective, FormsModule, ReactiveFormsModule,
     BadgeComponent,
-    IconDirective, 
-    ModalMessageComponent, 
-    GridPagerComponent, 
+    IconDirective,
+    ModalMessageComponent,
+    GridPagerComponent,
     NgIf,
     Select2Module
   ],
@@ -68,7 +68,7 @@ export class SearchComponent implements OnInit {
   hasTags: boolean = false;
 
   constructor(
-    private stickerRepository: StickerRepositoryService, 
+    private stickerRepository: StickerRepositoryService,
     private tagRepository: TagRepositoryService,
     private photoRepository: PhotoRepositoryService,
     private defaults: DefaultValuesService,
@@ -159,7 +159,7 @@ export class SearchComponent implements OnInit {
         }
       });
   }
-  private getStickers = (sticker: Sticker = this.defaults.StickerObject()) => {    
+  private getStickers = (sticker: Sticker = this.defaults.StickerObject()) => {
     this.stickerRepository
       .getStickers(sticker)
       .subscribe({

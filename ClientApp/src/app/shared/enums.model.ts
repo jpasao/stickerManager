@@ -13,9 +13,9 @@ export enum ApiAddresses {
     Dashboard = 'Dashboard',
 }
 export enum ColorClasses {
-    info = 'info',   
+    info = 'info',
     warning = 'warning',
-    danger = 'danger',    
+    danger = 'danger',
 }
 export enum ResponseTypes {
     NO_CHANGE = 0,
@@ -29,5 +29,5 @@ export enum Operations {
 export enum Entities {
     sticker = 'pegatina',
     tag = 'etiqueta',
-    photo = 'imagen',   
+    photo = 'imagen',
 }

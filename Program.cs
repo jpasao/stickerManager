@@ -46,7 +46,7 @@ if (app.Environment.IsDevelopment())
     {
         return next(context);
     });
-} 
+}
 
 app.UseStaticFiles();
 app.UseRouting();
@@ -56,5 +56,5 @@ app.Urls.Add("http://192.168.0.22:5001");
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
-    
+
 app.Run();

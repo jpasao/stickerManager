@@ -19,7 +19,7 @@ public class ImageController : ControllerBase
     [HttpGet]
     public async Task<IResult> Get(int id)
     {
-        return await repository.GetImages(id); 
+        return await repository.GetImages(id);
     }
 
     [HttpPost]

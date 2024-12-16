@@ -17,7 +17,7 @@ export const navItems: INavData[] = [
   },
   {
     name: 'Añadir',
-    url: '/stickers/save',    
+    url: '/stickers/save',
     iconComponent: { name: 'cil-pencil' }
   },
   {
@@ -31,7 +31,7 @@ export const navItems: INavData[] = [
   },
   {
     name: 'Añadir',
-    url: '/tags/save',    
+    url: '/tags/save',
     iconComponent: { name: 'cil-pencil' }
   }
 ];

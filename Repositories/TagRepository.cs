@@ -17,9 +17,9 @@ public class TagRepository(IOptions<ConnectionString> connectionStrings) : ITagR
     {
         try
         {
-            var sql = @"SELECT IdTag, TagName 
-                FROM tags 
-                WHERE (@TagName = '' OR TagName LIKE CONCAT('%', @TagName, '%')) 
+            var sql = @"SELECT IdTag, TagName
+                FROM tags
+                WHERE (@TagName = '' OR TagName LIKE CONCAT('%', @TagName, '%'))
                 ORDER BY TagName";
             var response = (await db.QueryAsync<Tag>(sql, tag).ConfigureAwait(false)).AsList();
 
@@ -37,7 +37,7 @@ public class TagRepository(IOptions<ConnectionString> connectionStrings) : ITagR
         {
             int tagSave = 0;
             string sql;
-            if (tag.IdTag == 0) 
+            if (tag.IdTag == 0)
             {
                 sql = "INSERT INTO tags (TagName) VALUES (@TagName); SELECT LAST_INSERT_ID()";
                 tagSave = await db.ExecuteScalarAsync<int>(sql, tag).ConfigureAwait(false);
@@ -73,7 +73,7 @@ public class TagRepository(IOptions<ConnectionString> connectionStrings) : ITagR
         catch (Exception ex)
         {
             return Response.BuildError(ex);
-        }        
+        }
     }
 
     public async Task<IResult> GetDependencies(int id)
@@ -81,7 +81,7 @@ public class TagRepository(IOptions<ConnectionString> connectionStrings) : ITagR
         try
         {
             var sql = @"
-                SELECT S.StickerName AS Name, 'Pegatinas' AS Category 
+                SELECT S.StickerName AS Name, 'Pegatinas' AS Category
                 FROM tags T
                     INNER JOIN stickertags ST ON T.IdTag = ST.IdTag
                     INNER JOIN stickers S ON S.IdSticker = ST.IdSticker
@@ -94,6 +94,6 @@ public class TagRepository(IOptions<ConnectionString> connectionStrings) : ITagR
         catch (Exception ex)
         {
             return Response.BuildError(ex);
-        }        
+        }
     }
 }

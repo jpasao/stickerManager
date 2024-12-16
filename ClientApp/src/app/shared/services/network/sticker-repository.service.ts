@@ -19,21 +19,21 @@ export class StickerRepositoryService {
       this.request.createCompleteRoute(ApiAddresses.Sticker, EndPoints.Get),
       sticker,
       this.request.generateHeaders()
-    );    
+    );
   }
 
   public createSticker = (sticker: Sticker) => {
     return this.http.post<number>(
-      this.request.createCompleteRoute(ApiAddresses.Sticker, EndPoints.Post), 
-      sticker, 
+      this.request.createCompleteRoute(ApiAddresses.Sticker, EndPoints.Post),
+      sticker,
       this.request.generateHeaders()
     );
   }
 
   public updateSticker = (sticker: Sticker) => {
     return this.http.put<number>(
-      this.request.createCompleteRoute(ApiAddresses.Sticker, ''), 
-      sticker, 
+      this.request.createCompleteRoute(ApiAddresses.Sticker, ''),
+      sticker,
       this.request.generateHeaders()
     );
   }
