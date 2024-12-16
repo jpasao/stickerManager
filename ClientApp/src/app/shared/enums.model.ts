@@ -24,8 +24,10 @@ export enum ResponseTypes {
 export enum Operations {
     get = 'obtener',
     save = 'guardar',
+    delete = 'borrar',
 }
 export enum Entities {
     sticker = 'pegatina',
-    tag = 'etiqueta',    
+    tag = 'etiqueta',
+    photo = 'imagen',   
 }

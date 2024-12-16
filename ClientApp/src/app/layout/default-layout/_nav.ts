@@ -4,7 +4,7 @@ export const navItems: INavData[] = [
   {
     name: 'Dashboard',
     url: '/dashboard',
-    iconComponent: { name: 'cil-barChart' }
+    iconComponent: { name: 'cil-bar-chart' }
   },
   {
     title: true,
@@ -16,7 +16,7 @@ export const navItems: INavData[] = [
     iconComponent: { name: 'cil-note-add' }
   },
   {
-    name: 'Guardar',
+    name: 'Añadir',
     url: '/stickers/save',    
     iconComponent: { name: 'cil-pencil' }
   },
@@ -30,7 +30,7 @@ export const navItems: INavData[] = [
     iconComponent: { name: 'cil-tag' }
   },
   {
-    name: 'Guardar',
+    name: 'Añadir',
     url: '/tags/save',    
     iconComponent: { name: 'cil-pencil' }
   }

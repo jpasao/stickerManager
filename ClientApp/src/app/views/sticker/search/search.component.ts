@@ -14,19 +14,19 @@ import {
   BadgeComponent
 } from '@coreui/angular';
 import { IconDirective } from '@coreui/icons-angular';
-import { ToastrService } from 'ngx-toastr';
 import { Select2Module, Select2Data, Select2UpdateEvent } from 'ng-select2-component';
 
 import { DefaultValuesService } from '../../../shared/services/default-values.service';
 import { StickerRepositoryService } from '../../../shared/services/network/sticker-repository.service'
 import { TagRepositoryService } from '../../../shared/services/network/tag-repository.service';
 import { PhotoRepositoryService } from '../../../shared/services/network/photo-repository.service';
-import { Entities, Operations, ResponseTypes } from '../../../shared/enums.model';
+import { ColorClasses, Entities, Operations, ResponseTypes } from '../../../shared/enums.model';
 import { Sticker } from './../../../interfaces/sticker.model';
 import { Tag } from '../../../interfaces/tag.model';
 import { ModalMessageComponent } from '../../../components/modal/modal-message.component';
 import { GridPagerComponent } from '../../../components/grid-pager/grid-pager.component';
 import { ErrorMessage } from '../../../interfaces/error.model';
+import { ShowToastService } from '../../../shared/services/show-toast.service';
 
 @Component({
   selector: 'app-search',
@@ -74,7 +74,7 @@ export class SearchComponent implements OnInit {
     private defaults: DefaultValuesService,
     private formBuilder: FormBuilder,
     private router: Router,
-    private toast: ToastrService
+    private toast: ShowToastService
   ) { }
 
   ngOnInit(): void {
@@ -142,7 +142,7 @@ export class SearchComponent implements OnInit {
   }
   onDelete(stickerToDelete: Sticker) {
     let message: string = `La pegatina '${stickerToDelete.StickerName}' se ha borrado correctamente`;
-    const toatsTitle = 'Borrando pegatina';
+    const toastTitle = 'Borrando pegatina';
 
     this.stickerRepository
       .deleteSticker(stickerToDelete)
@@ -151,11 +151,11 @@ export class SearchComponent implements OnInit {
           if ((this.stickers.length - 1) % this.itemsPerPage === 0) {
             this.currentPage = 1;
           }
-          this.toast.success(message, toatsTitle);
+          this.toast.show(toastTitle, message, ColorClasses.info);
           this.getStickers();
         } else {
           message = `Ha habido un problema al borrar la pegatina '${stickerToDelete.StickerName}'`;
-          this.toast.warning(message, toatsTitle);
+          this.toast.show(toastTitle, message, ColorClasses.warning);
         }
       });
   }
@@ -170,7 +170,7 @@ export class SearchComponent implements OnInit {
         },
         error: (err) => {
           const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.get, Entities.sticker);
-          this.toast.error(errorTexts.Message, errorTexts.Title);
+          this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
         }
       });
   }
@@ -188,7 +188,7 @@ export class SearchComponent implements OnInit {
         },
         error: (err) => {
           const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.get, Entities.tag);
-          this.toast.error(errorTexts.Message, errorTexts.Title);
+          this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
         }
       });
   }
@@ -228,18 +228,18 @@ export class SearchComponent implements OnInit {
       .subscribe({
         next: (response) => {
           let message: string = `La etiqueta '${tagName}' se ha guardado correctamente`;
-          const toatsTitle = 'Guardando etiqueta';
+          const toastTitle = 'Guardando etiqueta';
           
           if (response < ResponseTypes.SOME_CHANGES) {
             message = `Ha habido un problema al crear la etiqueta '${tagName}'`;
-            this.toast.warning(message, toatsTitle);
+            this.toast.show(toastTitle, message, ColorClasses.warning);
           } else {
-            this.toast.success(message, toatsTitle);          
+            this.toast.show(toastTitle, message, ColorClasses.info);
           }
         },
         error: (err) => {
           const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.save, Entities.tag);
-          this.toast.error(errorTexts.Message, errorTexts.Title);
+          this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
         }
       });
   }

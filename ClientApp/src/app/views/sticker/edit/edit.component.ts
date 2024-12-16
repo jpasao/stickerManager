@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgIf } from '@angular/common';
 
 import { 
-  CardComponent, CardHeaderComponent, CardBodyComponent, 
+  CardComponent, CardHeaderComponent, CardBodyComponent, ImgDirective, 
   ButtonDirective, 
   TableDirective, 
   RowComponent, ColComponent, 
@@ -12,24 +12,27 @@ import {
   TextColorDirective, 
   InputGroupComponent, InputGroupTextDirective 
 } from '@coreui/angular';
-import { ToastrService } from 'ngx-toastr';
 import { Select2Module, Select2Data, Select2UpdateEvent } from 'ng-select2-component';
 
 import { InvalidDirective } from '../../../shared/invalid.directive';
 import { DefaultValuesService } from '../../../shared/services/default-values.service';
 import { StickerRepositoryService } from '../../../shared/services/network/sticker-repository.service';
 import { TagRepositoryService } from '../../../shared/services/network/tag-repository.service';
+import { PhotoRepositoryService } from '../../../shared/services/network/photo-repository.service';
 import { Sticker } from '../../../interfaces/sticker.model';
 import { Tag } from '../../../interfaces/tag.model';
 import { Dependency } from '../../../interfaces/dependency.model';
+import { Photo } from '../../../interfaces/photo.model';
 import { ErrorMessage } from '../../../interfaces/error.model';
-import { ResponseTypes, Operations, Entities } from '../../../shared/enums.model';
+import { ResponseTypes, Operations, Entities, ColorClasses } from '../../../shared/enums.model';
+import { ModalMessageComponent } from '../../../components/modal/modal-message.component';
+import { ShowToastService } from '../../../shared/services/show-toast.service';
 
 @Component({
   selector: 'app-edit',
   standalone: true,
   imports: [
-    CardComponent, CardHeaderComponent, CardBodyComponent, 
+    CardComponent, CardHeaderComponent, CardBodyComponent, ImgDirective, 
     ButtonDirective, 
     TableDirective, 
     RowComponent, ColComponent, 
@@ -38,7 +41,8 @@ import { ResponseTypes, Operations, Entities } from '../../../shared/enums.model
     InputGroupComponent, InputGroupTextDirective, 
     InvalidDirective, 
     NgIf,
-    Select2Module
+    Select2Module,
+    ModalMessageComponent,
   ],
   templateUrl: './edit.component.html',
   styleUrl: './edit.component.scss'
@@ -47,20 +51,25 @@ export class EditComponent implements OnInit {
   receivedSticker: Sticker = this.defaults.StickerObject();
   tags: Select2Data = [];
   stickerTags: number[] = [];
+  stickerImage!: Photo;
   isEditing: boolean;
   stickerEditForm!: FormGroup;
   savePlaceholder: string;
   formValidated: boolean = false;
   dependencies!: Dependency[];
   saving: boolean = false;
+  @ViewChild(ModalMessageComponent) modalComponent!: ModalMessageComponent;
+  modalTitle: string = '';
+  modalMessage: string = '';
 
   constructor(
     private stickerRepository: StickerRepositoryService,
     private tagRepository: TagRepositoryService,
+    private photoRepository: PhotoRepositoryService,
     private router: Router, 
     private defaults: DefaultValuesService,
     private formBuilder: FormBuilder,
-    private toast: ToastrService) {
+    private toast: ShowToastService) {
     const receivedData = this.router.getCurrentNavigation()?.extras.state as Sticker || {};
     const hasData = Object.keys(receivedData).length > 0;
     if (hasData) {
@@ -74,6 +83,7 @@ export class EditComponent implements OnInit {
   
   ngOnInit(): void {
     this.getTags();
+    this.getPhoto();
     this.stickerEditForm = this.formBuilder.group({ 
       name: [this.receivedSticker.StickerName, [Validators.required]],
       tag: [this.receivedSticker.Tag]
@@ -110,18 +120,76 @@ export class EditComponent implements OnInit {
       .subscribe({
         next: (response) => {
           let message: string = `La etiqueta '${tagName}' se ha guardado correctamente`;
-          const toatsTitle = 'Guardando etiqueta';
+          const toastTitle = 'Guardando etiqueta';
           
           if (response < ResponseTypes.SOME_CHANGES) {
             message = `Ha habido un problema al crear la etiqueta '${tagName}'`;
-            this.toast.warning(message, toatsTitle);
+            this.toast.show(toastTitle, message, ColorClasses.warning);
           } else {
-            this.toast.success(message, toatsTitle);          
+            this.toast.show(toastTitle, message, ColorClasses.info);
           }
         },
         error: (err) => {
           const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.save, Entities.tag);
-          this.toast.error(errorTexts.Message, errorTexts.Title);
+          this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
+        }
+      });
+  }
+
+  getPhoto() {
+    this.photoRepository
+      .getPhotos(this.receivedSticker)
+      .subscribe({
+        next: (response) => {
+          if (response.length) {
+            const imageSrc = (response !== null && response.length > 0)
+            ? `data:image/jpeg;base64,${response[0].StickerImage}`
+            : '';
+            this.stickerImage = {
+              IdSticker: this.receivedSticker.IdSticker || 0,
+              IdImage: response[0].IdImage,
+              StickerImage: new FormData,
+              Src: imageSrc
+            }
+          }
+        },
+        error: (err) => {
+          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.get, Entities.photo);
+          this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
+        }
+      });
+  }
+
+  openDeleteModal() {
+    this.modalTitle = 'Borrando imagen';
+    this.modalMessage = `Vas a borrar la imagen de '${this.receivedSticker.StickerName}'. ¿Estás segura?`;
+    this.modalComponent.toggleModal();
+  }
+  handleDeleteModalResponse(event: boolean) {
+    if (event) {
+      this.modalComponent.toggleModal();
+      this.deletePhoto();
+    }
+  }
+  deletePhoto() {
+    let message: string = `La imagen de '${this.receivedSticker.StickerName}' se ha borrado correctamente`;
+    const toatsTitle = 'Borrando imagen';
+
+    this.photoRepository
+      .deletePhoto(this.stickerImage.IdImage)
+      .subscribe({
+        next: (response) => {
+          if (response > ResponseTypes.NO_CHANGE) {
+            this.toast.show(toatsTitle, message, ColorClasses.info);
+            this.stickerImage.Src = '';
+          } else {
+            message = `Ha habido un problema al borrar la imagen de '${this.receivedSticker.StickerName}'`;
+            this.toast.show(toatsTitle, message, ColorClasses.warning);
+          }
+        },
+        error: (err) => {
+          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.delete, Entities.photo);
+          this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
         }
       });
   }
@@ -133,7 +201,7 @@ export class EditComponent implements OnInit {
     if (name.length === 0) {
       return;
     }
-    const tagsToSave = tags.length > 0
+    const tagsToSave = tags[0].IdTag === undefined
       ? tags.map((tag: number) => {
         return { IdTag: tag, TagName: '' }
       })
@@ -153,7 +221,7 @@ export class EditComponent implements OnInit {
           },
           error: (err) => {
             const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.save, Entities.sticker);
-            this.toast.error(errorTexts.Message, errorTexts.Title);
+            this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
           }
         });
     } else {
@@ -165,7 +233,7 @@ export class EditComponent implements OnInit {
           },
           error: (err) => {
             const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.save, Entities.sticker);
-            this.toast.error(errorTexts.Message, errorTexts.Title);
+            this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
           }
         });
     }
@@ -173,15 +241,81 @@ export class EditComponent implements OnInit {
 
   handleResponse(result: number) {
     let message: string = `La pegatina '${this.form['name'].value}' se ha guardado correctamente`;
-    const toatsTitle = 'Guardando pegatina';
-    
+    const toastTitle = 'Guardando pegatina';
+
     if (result < ResponseTypes.SOME_CHANGES) {
       message = `Ha habido un problema al editar la pegatina '${this.form['name'].value}'`;
-      this.toast.warning(message, toatsTitle);
+      this.toast.show(toastTitle, message, ColorClasses.warning);
     } else {
-      this.toast.success(message, toatsTitle);
-      this.router.navigate(['/stickers/search']);
+      this.toast.show(toastTitle, message, ColorClasses.info);
+      if (this.isEditing === false) {
+        this.isEditing = true;
+        this.receivedSticker.IdSticker = result;
+        this.receivedSticker.StickerName = this.form['name'].value;
+        this.receivedSticker.Tag = this.form['tag'].value;
+      }
     }
+  }
+
+  handleAddImage(event: Event) {
+    const element = event.currentTarget as HTMLInputElement;
+    let fileList: FileList | null = element.files;
+    if (fileList) {
+
+      this.convertToBase64(fileList[0]).then((base64) => {
+        this.stickerImage = {
+          IdSticker: this.receivedSticker.IdSticker,
+          IdImage: 0,
+          StickerImage: new FormData,
+          Src: `${base64}`
+        };
+      });
+      const formData = new FormData();
+      formData.append('image', fileList[0], fileList[0].name);
+      const imageToSave: Photo = {
+        IdSticker: this.receivedSticker.IdSticker,
+        IdImage: 0,
+        StickerImage: formData,
+        Src: ''
+      };
+      this.photoRepository
+        .savePhoto(imageToSave)
+        .subscribe({
+          next: (response) => {
+            let message: string = `La imagen se ha guardado correctamente`;
+            const toastTitle = 'Guardando imagen';
+            if (response < ResponseTypes.SOME_CHANGES) {
+              message = `Ha habido un problema al guardar la imagen para '${this.form['name'].value}'`;
+              this.toast.show(toastTitle, message, ColorClasses.warning);
+            } else {
+              this.stickerImage = {
+                IdSticker: this.receivedSticker.IdSticker,
+                IdImage: response,
+                StickerImage: new FormData,
+                Src: this.stickerImage.Src
+              };
+              this.toast.show(toastTitle, message, ColorClasses.info);
+            }
+          },
+          error: (err) => {
+            const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.save, Entities.photo);
+            this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
+          }
+        });
+    }
+  }
+
+  convertToBase64(file: any) {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      }
+      fileReader.onerror = (error) => {
+        reject(error);
+      }
+    });
   }
 
   getWidth() {

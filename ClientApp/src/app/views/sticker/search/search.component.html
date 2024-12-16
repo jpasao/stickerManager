@@ -79,13 +79,22 @@
           </table>
         </c-col>
         <c-col>
-          <table cTable bordered *ngIf="showDetails">
+          <table cTable bordered>
             <thead>
               <tr>
                 <th class="bg-body-tertiary">Detalles</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody *ngIf="!showDetails">
+              <tr>
+                <td>Haz click en
+                  <button cButton color="info" variant="ghost">
+                    <svg [cIcon]="actionIcons.cilFeaturedPlaylist"></svg>
+                </button>
+                para ver los detalles de la fila</td>
+              </tr>
+            </tbody>
+            <tbody *ngIf="showDetails">
               <tr>
                 <td>Etiquetas:
                   <br/>
@@ -100,13 +109,13 @@
                 </td>
               </tr>
               <tr>
-                <td>Foto:
+                <td>Imagen:
                   <br/>
                   @if (stickerImage === '') {
-                    <label>Esta pegatina aún no tiene foto.</label>&nbsp;<a href="#" color="link" (click)="onEdit(stickerToHandle)">¿A qué esperas?</a>
+                    <label>Esta pegatina no es nada sin una imagen. Si alguien le pusiera una...</label>
                   } 
                   @else {
-                    <img cImg fluid [src]="stickerImage" />
+                    <img cImg fluid thumbnail [src]="stickerImage" />
                   }
                 </td>
               </tr>

@@ -21,16 +21,16 @@ export class PhotoRepositoryService {
     );
   }
 
-  public savePhoto = (sticker: Sticker, image: Photo) => {
+  public savePhoto = (image: Photo) => {
     return this.http.post<number>(
-      this.request.createCompleteRoute(ApiAddresses.Image, '', sticker.IdSticker),
+      this.request.createCompleteRoute(ApiAddresses.Image, '', image.IdSticker),
       image.StickerImage
     );
   }
 
-  public deletePhoto = (image: Photo) => {
+  public deletePhoto = (idPhoto: number) => {
     return this.http.delete<number>(
-      this.request.createCompleteRoute(ApiAddresses.Image, '', image.IdPhoto)
+      this.request.createCompleteRoute(ApiAddresses.Image, '', idPhoto)
     );
   }
 }

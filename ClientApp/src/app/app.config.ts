@@ -32,7 +32,7 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(SidebarModule, DropdownModule),
     IconSetService,
     provideAnimations(),
-    provideToastr(),
+    provideToastr({ closeButton: true, autoDismiss: true }),
     provideHttpClient(withFetch()),
   ]
 };

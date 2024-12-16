@@ -13,14 +13,14 @@ import {
   FormDirective, FormLabelDirective, FormControlDirective 
 } from '@coreui/angular';
 import { IconDirective } from '@coreui/icons-angular';
-import { ToastrService } from 'ngx-toastr';
 
 import { DefaultValuesService } from '../../../shared/services/default-values.service';
 import { TagRepositoryService } from '../../../shared/services/network/tag-repository.service';
-import { ResponseTypes } from '../../../shared/enums.model';
+import { ColorClasses, ResponseTypes } from '../../../shared/enums.model';
 import { Tag } from './../../../interfaces/tag.model';
 import { ModalMessageComponent } from '../../../components/modal/modal-message.component';
 import { GridPagerComponent } from '../../../components/grid-pager/grid-pager.component';
+import { ShowToastService } from '../../../shared/services/show-toast.service';
 
 @Component({
   selector: 'app-search',
@@ -60,7 +60,7 @@ export class SearchComponent implements OnInit {
     private defaults: DefaultValuesService,
     private formBuilder: FormBuilder,
     private router: Router,
-    private toast: ToastrService
+    private toast: ShowToastService
   ) { }
 
   ngOnInit(): void {
@@ -102,7 +102,7 @@ export class SearchComponent implements OnInit {
   }
   onDelete(tagToDelete: Tag) {
     let message: string = `La etiqueta '${tagToDelete.TagName}' se ha borrado correctamente`;
-    const toatsTitle = 'Borrando etiqueta';
+    const toastTitle = 'Borrando etiqueta';
 
     this.repository
       .deleteTag(tagToDelete)
@@ -111,11 +111,11 @@ export class SearchComponent implements OnInit {
           if ((this.tags.length - 1) % this.itemsPerPage === 0) {
             this.currentPage = 1;
           }
-          this.toast.success(message, toatsTitle);
+          this.toast.show(toastTitle, message, ColorClasses.info);
           this.getTags();
         } else {
           message = `Ha habido un problema al borrar la etiqueta '${tagToDelete.TagName}'`;
-          this.toast.warning(message, toatsTitle);
+          this.toast.show(toastTitle, message, ColorClasses.warning);
         }
       });
   }

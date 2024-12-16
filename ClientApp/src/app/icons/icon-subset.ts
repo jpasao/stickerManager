@@ -88,6 +88,7 @@ import {
   cilSun,
   cilTag,
   cilTags,
+  cilTransfer,
   cilBrightness,
   cilImage,
   cilLemon,
@@ -98,7 +99,8 @@ import {
   cilUser,
   cilUserFemale,
   cilUserFollow,
-  cilUserUnfollow
+  cilUserUnfollow,
+  cilBarChart
 } from '@coreui/icons';
 
 import { signet } from './signet';
@@ -130,6 +132,7 @@ export const iconSubset = {
   cilArrowBottom,
   cilArrowRight,
   cilArrowTop,
+  cilBarChart,
   cilBasket,
   cilBell,
   cilBold,
@@ -199,6 +202,7 @@ export const iconSubset = {
   cilLemon,
   cilNoteAdd,
   cilTask,
+  cilTransfer,
   cilTrash,
   cilUnderline,
   cilUser,
@@ -235,6 +239,7 @@ export enum IconSubset {
   cilArrowBottom = 'cilArrowBottom',
   cilArrowRight = 'cilArrowRight',
   cilArrowTop = 'cilArrowTop',
+  cilBarChart = 'cilBarChart',
   cilBasket = 'cilBasket',
   cilBell = 'cilBell',
   cilBold = 'cilBold',

@@ -12,15 +12,15 @@ import {
   TextColorDirective, 
   InputGroupComponent, InputGroupTextDirective 
 } from '@coreui/angular';
-import { ToastrService } from 'ngx-toastr';
 
 import { InvalidDirective } from '../../../shared/invalid.directive';
 import { DefaultValuesService } from '../../../shared/services/default-values.service';
 import { TagRepositoryService } from '../../../shared/services/network/tag-repository.service';
 import { Tag } from '../../../interfaces/tag.model';
 import { Dependency } from '../../../interfaces/dependency.model';
-import { Entities, Operations, ResponseTypes } from '../../../shared/enums.model';
+import { ColorClasses, Entities, Operations, ResponseTypes } from '../../../shared/enums.model';
 import { ErrorMessage } from '../../../interfaces/error.model';
+import { ShowToastService } from '../../../shared/services/show-toast.service';
 
 @Component({
   selector: 'app-edit',
@@ -53,7 +53,7 @@ export class EditComponent implements OnInit {
     private router: Router, 
     private defaults: DefaultValuesService,
     private formBuilder: FormBuilder,
-    private toast: ToastrService) {
+    private toast: ShowToastService) {
     const receivedData = this.router.getCurrentNavigation()?.extras.state as Tag || {};
     const hasData = Object.keys(receivedData).length > 0;
     if (hasData) {
@@ -91,7 +91,7 @@ export class EditComponent implements OnInit {
           },
           error: (err) => {
             const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.save, Entities.tag);
-            this.toast.error(errorTexts.Message, errorTexts.Title);
+            this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
           }
         });
     } else {
@@ -103,7 +103,7 @@ export class EditComponent implements OnInit {
           },
           error: (err) => {
             const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.save, Entities.tag);
-            this.toast.error(errorTexts.Message, errorTexts.Title);
+            this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
           }
         });
     }
@@ -111,13 +111,13 @@ export class EditComponent implements OnInit {
 
   handleResponse(result: number) {
     let message: string = `La etiqueta '${this.form['name'].value}' se ha guardado correctamente`;
-    const toatsTitle = 'Guardando etiqueta';
+    const toastTitle = 'Guardando etiqueta';
     
     if (result < ResponseTypes.SOME_CHANGES) {
       message = `Ha habido un problema al editar la etiqueta '${this.form['name'].value}'`;
-      this.toast.warning(message, toatsTitle);
+      this.toast.show(toastTitle, message, ColorClasses.warning);
     } else {
-      this.toast.success(message, toatsTitle);
+      this.toast.show(toastTitle, message, ColorClasses.info);
       this.router.navigate(['/tags/search']);
     }
   }

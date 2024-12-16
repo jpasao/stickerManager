@@ -53,8 +53,7 @@ form.ng-submitted .invalid-feedback {
 .select2-selection--multiple {
   border: var(--cui-border-width) solid var(--cui-border-color) !important;
   min-height: 38px !important;
+  border-radius: var(--cui-border-radius) !important;
 }
-.tallSelectContainer input {
-  height: 0;
-}
+
 // End Select2 combos

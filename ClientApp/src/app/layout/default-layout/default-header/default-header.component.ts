@@ -1,10 +1,9 @@
 import { NgStyle, NgTemplateOutlet } from '@angular/common';
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import {
   BreadcrumbRouterComponent,
-  ColorModeService,
   ContainerComponent,
   DropdownComponent,
   DropdownHeaderDirective,
