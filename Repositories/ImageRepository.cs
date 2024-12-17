@@ -17,7 +17,7 @@ public class ImageRepository(IOptions<ConnectionString> connectionStrings) : IIm
     {
         try
         {
-            var sql = @"SELECT IdImage, StickerImage
+            var sql = @"SELECT IdImage, StickerImage, StickerThumbnail
                         FROM images
                         WHERE IdSticker = @IdSticker";
             var response = (await db.QueryAsync<Image>(sql, new { IdSticker = idSticker }).ConfigureAwait(false)).AsList();

@@ -43,8 +43,9 @@
                   <c-col xs="12" md="6">
                     @if (stickerImage && stickerImage.Src !== '') {
                       <img cImg fluid [src]="stickerImage.Src" thumbnail />
-                      <div class="d-grid gap-2 d-md-flex justify-content-md-end my-3">
+                      <div class="d-grid gap-2 d-md-flex justify-content-md-between my-3">
                         <button cButton color="danger" class="me-md-2" (click)="openDeleteModal()">Borrar</button>
+                        <a cButton color="primary" class="me-md-2" [href]="stickerImage.Src" [download]="receivedSticker.StickerName">Descargar</a>
                       </div>
                     }
                     @else {

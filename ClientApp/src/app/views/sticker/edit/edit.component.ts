@@ -150,11 +150,15 @@ export class EditComponent implements OnInit {
             const imageSrc = (response !== null && response.length > 0)
             ? `data:image/jpeg;base64,${response[0].StickerImage}`
             : '';
+            const imageThumbnail = (response !== null && response.length > 0)
+            ? `data:image/jpeg;base64,${response[0].Thumbnail}`
+            : '';
             this.stickerImage = {
               IdSticker: this.receivedSticker.IdSticker || 0,
               IdImage: response[0].IdImage,
               StickerImage: new FormData,
-              Src: imageSrc
+              Src: imageSrc,
+              Thumbnail: imageThumbnail
             }
           }
         },
@@ -277,7 +281,8 @@ export class EditComponent implements OnInit {
             IdSticker: this.receivedSticker.IdSticker,
             IdImage: 0,
             StickerImage: new FormData,
-            Src: `${base64}`
+            Src: `${base64}`,
+            Thumbnail: ''
           };
         });
 
@@ -290,7 +295,8 @@ export class EditComponent implements OnInit {
         IdSticker: this.receivedSticker.IdSticker,
         IdImage: 0,
         StickerImage: formData,
-        Src: ''
+        Src: '',
+        Thumbnail: ''
       };
       this.photoRepository
         .savePhoto(imageToSave)
@@ -306,7 +312,8 @@ export class EditComponent implements OnInit {
                 IdSticker: this.receivedSticker.IdSticker,
                 IdImage: response,
                 StickerImage: new FormData,
-                Src: this.stickerImage.Src
+                Src: this.stickerImage.Src,
+                Thumbnail: ''
               };
               this.toast.show(toastTitle, message, ColorClasses.info);
             }
