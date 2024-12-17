@@ -47,6 +47,47 @@ export class DefaultValuesService {
       Message: errorMessage
     };
   }
+  public convertToBase64(file: any) {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      }
+      fileReader.onerror = (error) => {
+        reject(error);
+      }
+    });
+  }
+  public resizeImage(imageURL: any): Promise<any> {
+    return new Promise((resolve) => {
+      const image = new Image();
+      image.onload = function () {
+        const thumbnailSize: number = 150;
+        const canvas = document.createElement('canvas');
+        canvas.width = thumbnailSize;
+        canvas.height = thumbnailSize;
+        const ctx = canvas.getContext('2d');
+        if (ctx != null) {
+          ctx.drawImage(image, 0, 0, thumbnailSize, thumbnailSize);
+        }
+        return canvas.toBlob((blob) => resolve(blob));
+      };
+      image.src = imageURL;
+    });
+  }
+  public async getThumbnail(file: any): Promise<any> {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = async () => {
+        await this.resizeImage(reader.result as string)
+          .then((result: any) => {
+            resolve(result);
+          });
+      }
+    })
+  }
 
   constructor() { }
 }

@@ -26,6 +26,7 @@ CREATE TABLE `images` (
   `IdImage` int(11) NOT NULL AUTO_INCREMENT,
   `IdSticker` int(11) NOT NULL,
   `StickerImage` mediumblob NOT NULL,
+  `StickerThumbnail` blob NOT NULL DEFAULT 0,
   PRIMARY KEY (`IdImage`),
   KEY `images_stickers_FK` (`IdSticker`),
   CONSTRAINT `images_stickers_FK` FOREIGN KEY (`IdSticker`) REFERENCES `stickers` (`IdSticker`) ON DELETE CASCADE ON UPDATE CASCADE

@@ -11,11 +11,13 @@ public class Image
     public int IdSticker { get; set; }
 
     public required byte[] StickerImage { get; set; }
+
+    public required byte[] StickerThumbnail { get; set; }
 }
 
-public class ImageData
-{
-    public int IdSticker { get; set; }
+// public class ImageData
+// {
+//     public int IdSticker { get; set; }
 
-    public required IFormFile Image { get; set; }
-}
+//     public required List<IFormFile> Image { get; set; }
+// }

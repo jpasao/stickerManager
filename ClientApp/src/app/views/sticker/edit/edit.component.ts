@@ -266,21 +266,26 @@ export class EditComponent implements OnInit {
     }
   }
 
-  handleAddImage(event: Event) {
+  async handleAddImage(event: Event) {
     const element = event.currentTarget as HTMLInputElement;
     let fileList: FileList | null = element.files;
     if (fileList) {
+      this.defaults
+        .convertToBase64(fileList[0])
+        .then((base64) => {
+          this.stickerImage = {
+            IdSticker: this.receivedSticker.IdSticker,
+            IdImage: 0,
+            StickerImage: new FormData,
+            Src: `${base64}`
+          };
+        });
 
-      this.convertToBase64(fileList[0]).then((base64) => {
-        this.stickerImage = {
-          IdSticker: this.receivedSticker.IdSticker,
-          IdImage: 0,
-          StickerImage: new FormData,
-          Src: `${base64}`
-        };
-      });
+      const thumbnail = await this.defaults.getThumbnail(fileList[0]);
+
       const formData = new FormData();
-      formData.append('image', fileList[0], fileList[0].name);
+      formData.append('images', fileList[0]);
+      formData.append('images', thumbnail);
       const imageToSave: Photo = {
         IdSticker: this.receivedSticker.IdSticker,
         IdImage: 0,
@@ -312,19 +317,6 @@ export class EditComponent implements OnInit {
           }
         });
     }
-  }
-
-  convertToBase64(file: any) {
-    return new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(file);
-      fileReader.onload = () => {
-        resolve(fileReader.result);
-      }
-      fileReader.onerror = (error) => {
-        reject(error);
-      }
-    });
   }
 
   getWidth() {

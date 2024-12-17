@@ -23,9 +23,9 @@ public class ImageController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IResult> Post(int id, IFormFile image)
+    public async Task<IResult> Post(int id, List<IFormFile> images)
     {
-        return await repository.SaveImage(id, image);
+        return await repository.SaveImage(id, images);
     }
 
     [HttpDelete]

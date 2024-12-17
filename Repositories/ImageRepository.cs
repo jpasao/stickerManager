@@ -30,28 +30,23 @@ public class ImageRepository(IOptions<ConnectionString> connectionStrings) : IIm
         }
     }
 
-    public async Task<IResult> SaveImage(int idSticker, IFormFile image)
+    public async Task<IResult> SaveImage(int idSticker, List<IFormFile> images)
     {
         try
         {
-            if (image == null || image.Length == 0) 
+            if (images.Count == 0 || images.First() == null || images.First().Length == 0) 
             {
                 return Response.BuildError(new Exception("No data received"), 400);
             }
-            byte[]? imageBytes = null;
-
-            using (var imageFileStream = image.OpenReadStream())
-            using (var imageMemoryStream = new MemoryStream())
-            {
-                await imageFileStream.CopyToAsync(imageMemoryStream);
-                imageBytes = imageMemoryStream.ToArray();
-            }
+            byte[]? imageBytes = await GetImageArray(images[0]);
+            byte[]? imageThumbnail = await GetImageArray(images[1]);
 
             DynamicParameters parameters = new DynamicParameters();
             parameters.Add("@IdSticker", idSticker);
             parameters.Add("@StickerImage", imageBytes, DbType.Binary, ParameterDirection.Input);
+            parameters.Add("@StickerThumbnail", imageThumbnail, DbType.Binary, ParameterDirection.Input);
 
-            string sql = "INSERT INTO images (IdSticker, StickerImage) VALUES (@IdSticker, @StickerImage); SELECT LAST_INSERT_ID()";
+            string sql = "INSERT INTO images (IdSticker, StickerImage, StickerThumbnail) VALUES (@IdSticker, @StickerImage, @StickerThumbnail); SELECT LAST_INSERT_ID()";
             int response = await db.ExecuteScalarAsync<int>(sql, parameters).ConfigureAwait(false);
 
             return Response.BuildResponse(response);
@@ -59,6 +54,16 @@ public class ImageRepository(IOptions<ConnectionString> connectionStrings) : IIm
         catch (Exception ex)
         {
             return Response.BuildError(ex);
+        }
+    }
+
+    private async Task<byte[]> GetImageArray(IFormFile image)
+    {
+        using (var imageFileStream = image.OpenReadStream())
+        using (var imageMemoryStream = new MemoryStream())
+        {
+            await imageFileStream.CopyToAsync(imageMemoryStream);
+            return imageMemoryStream.ToArray();
         }
     }
 

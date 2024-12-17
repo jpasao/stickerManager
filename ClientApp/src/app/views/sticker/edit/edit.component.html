@@ -6,7 +6,7 @@
             </c-card-header>
             <c-card-body>
               <c-row gutter="3" class="align-items-top">
-                <c-col xs="12" md="6">                  
+                <c-col xs="12" md="6">
                   <form #customStylesForm="ngForm" cForm (ngSubmit)="onSubmit()" [formGroup]="stickerEditForm" [validated]="formValidated" class="needs-validation" novalidate>
                     <c-row class="my-3">
                       <c-col xs="3" md="2">
@@ -23,7 +23,7 @@
                       </c-col>
                       <c-col xs="9" md="10">
                         <select2 formControlName="tag" multiple="true"
-                          [data]="tags"  
+                          [data]="tags"
                           noResultMessage="Enter para crear una nueva etiqueta" 
                           (autoCreateItem)="handleCreateTag($event)"
                           [value]="stickerTags"
