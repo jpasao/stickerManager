@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Tag } from '../../interfaces/tag.model'
 import { Sticker } from '../../interfaces/sticker.model';
 import { ErrorMessage } from '../../interfaces/error.model';
+import { EndPoints } from '../enums.model';
 
 @Injectable({
   providedIn: 'root'
@@ -27,20 +28,20 @@ export class DefaultValuesService {
     const firstItemIndex = lastItemIndex - itemsPerPage;
     return items.slice(firstItemIndex, lastItemIndex);
   }
-  public SaveItemsPerPage = (number: string) => {
-    localStorage.setItem('itemsPerPage', number);
+  public SaveItemsPerPage = (number: string, page: EndPoints) => {
+    localStorage.setItem(`${page}itemsPerPage`, number);
   }
-  public GetItemsPerPage = (): number => {
-    const items = localStorage.getItem('itemsPerPage');
+  public GetItemsPerPage = (page: EndPoints): number => {
+    const items = localStorage.getItem(`${page}itemsPerPage`);
     if (items === null) {
       const defaultItems = this.ItemsPerTable[1].toString();
-      this.SaveItemsPerPage(defaultItems);
+      this.SaveItemsPerPage(defaultItems, page);
       return  parseInt(defaultItems);
     }
     return parseInt(items);
   }
   public GetErrorMessage(err: any, operation: string, element: string): ErrorMessage {
-    const errorMessage: string = err.error.title || err.error.message || err.error;
+    const errorMessage: string = err?.error?.title || err?.error?.message || err.error;
     const errorTitle = `Error al ${operation} la ${element}`;
     return {
       Title: errorTitle,

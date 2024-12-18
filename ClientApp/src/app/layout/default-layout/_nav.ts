@@ -21,6 +21,11 @@ export const navItems: INavData[] = [
     iconComponent: { name: 'cil-pencil' }
   },
   {
+    name: 'Galería',
+    url: '/stickers/gallery',
+    iconComponent: { name: 'cil-applications' }
+  },
+  {
     name: 'Etiquetas',
     title: true
   },

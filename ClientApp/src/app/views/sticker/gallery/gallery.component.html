@@ -1,0 +1,29 @@
+<c-card>
+    <c-card-header>
+        Miniaturas
+        <label class="alignRight">
+            <select cSelect (change)="handleChangeTableRows($event)" [ngModel]="itemsPerPage">
+                @for(item of itemsPerTable; track item) {
+                <option>
+                    {{item}}
+                </option>
+                }
+            </select>
+        </label>
+    </c-card-header>
+    <c-card-body>
+        <c-row [xs]="2" [md]="5">
+            @for(image of images; track image?.IdImage) {
+                <c-col class="my-2">
+                    <c-card [cBorder]="{ top: { color: 'secondary', width: 3 }}" class="h-100">
+                        <c-card-header>{{image.StickerName}}</c-card-header>
+                        <c-card-body>
+                            <img cCardImg [src]="image?.StickerThumbnail" style="max-width: 100%;" />
+                        </c-card-body>
+                    </c-card>
+                </c-col>
+            }
+        </c-row>
+        <app-grid-pager *ngIf="showPager" [itemsPerPage]="itemsPerPage" [totalItems]="totalItems" [currentPage]="currentPage" (pageNumber)="handlePageChange($event)"></app-grid-pager>
+    </c-card-body>
+</c-card>

@@ -50,6 +50,14 @@ public class TagRepository(IOptions<ConnectionString> connectionStrings) : ITagR
 
             return Response.BuildResponse(tagSave);
         }
+        catch (MySqlException ex)
+        {
+            if (ex.Message.Contains("Duplicate")) {
+                var exception = new UniqueException("Pegatinas");
+                return Response.BuildError(exception, 400);
+            }
+            return Response.BuildError(ex, 400);
+        }
         catch (UniqueException ex)
         {
             return Response.BuildError(ex, 400);

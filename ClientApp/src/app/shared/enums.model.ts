@@ -5,6 +5,8 @@ export enum EndPoints {
     Tag = 'Tag',
     Overview = 'Overview',
     Dependency = 'Dependency',
+    Thumbnail = 'Thumbnails',
+    Count = 'Count'
 }
 export enum ApiAddresses {
     Tag = 'Tag',

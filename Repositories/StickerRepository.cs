@@ -123,13 +123,20 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
 
             return Response.BuildResponse(response); 
         }
+        catch (MySqlException ex)
+        {
+            if (ex.Message.Contains("Duplicate")) {
+                var exception = new UniqueException("Pegatinas");
+                return Response.BuildError(exception, 400);
+            }
+            return Response.BuildError(ex, 400);
+        }
         catch (UniqueException ex)
         {
             return Response.BuildError(ex, 400);
         }
         catch (Exception ex)
         {
-            if (ex.Message.Contains("Duplicate")) throw new UniqueException("Pegatinas");
             return Response.BuildError(ex);
         }
     }

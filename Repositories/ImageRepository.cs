@@ -12,12 +12,12 @@ namespace sticker.Repositories;
 public class ImageRepository(IOptions<ConnectionString> connectionStrings) : IImageRepository
 {
     private readonly IDbConnection db = new MySqlConnection(connectionStrings.Value.StickerConnectionString);
-    
+
     public async Task<IResult> GetImages(int idSticker)
     {
         try
         {
-            var sql = @"SELECT IdImage, StickerImage, StickerThumbnail
+            var sql = @"SELECT IdImage, StickerImage
                         FROM images
                         WHERE IdSticker = @IdSticker";
             var response = (await db.QueryAsync<Image>(sql, new { IdSticker = idSticker }).ConfigureAwait(false)).AsList();
@@ -27,6 +27,41 @@ public class ImageRepository(IOptions<ConnectionString> connectionStrings) : IIm
         catch (Exception ex)
         {
             return Response.BuildError(ex);
+        }
+    }
+
+    public async Task<IResult> GetThumbnails(Page page)
+    {
+        try
+        {
+            var start = page.Start - 1;
+            var sql = @$"SELECT I.IdImage, I.StickerThumbnail, S.StickerName
+                         FROM images I
+                            INNER JOIN stickers S ON I.IdSticker = S.IdSticker
+                         LIMIT {start},{page.Size}";
+            var response = (await db.QueryAsync<Image>(sql).ConfigureAwait(false)).AsList();
+
+            return Response.BuildResponse(response);
+        }
+        catch (Exception ex)
+        {
+            return Response.BuildError(ex);
+        }
+    }
+
+    public async Task<IResult> CountImages()
+    {
+        try
+        {
+            var sql = $"SELECT COUNT(*) FROM images";
+            var response = (await db.QueryAsync<int>(sql).ConfigureAwait(false)).AsList();
+
+            return Response.BuildResponse(response);
+        }
+        catch (Exception ex)
+        {
+            return Response.BuildError(ex);
+            throw;
         }
     }
 

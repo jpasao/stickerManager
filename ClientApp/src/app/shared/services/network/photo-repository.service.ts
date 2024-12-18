@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Sticker } from '../../../interfaces/sticker.model'; 
 import { Photo } from '../../../interfaces/photo.model';
-import { ApiAddresses } from '../../enums.model';
+import { ApiAddresses, EndPoints } from '../../enums.model';
 import { RequestHelperService } from './request-helper.service';
 
 @Injectable({
@@ -18,6 +18,19 @@ export class PhotoRepositoryService {
   public getPhotos = (sticker: Sticker) => {
     return this.http.get<Photo[]>(
       this.request.createCompleteRoute(ApiAddresses.Image, '', sticker.IdSticker)
+    );
+  }
+
+  public getThumbnails = (start: number, size: number) => {
+    return this.http.post<Photo[]>(
+      this.request.createCompleteRoute(ApiAddresses.Image, EndPoints.Thumbnail),
+      { Start: start, Size: size }
+    );
+  }
+
+  public countPhotos = () => {
+    return this.http.get<number[]>(
+      this.request.createCompleteRoute(ApiAddresses.Image, EndPoints.Count)
     );
   }
 

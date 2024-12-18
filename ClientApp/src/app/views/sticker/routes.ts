@@ -26,6 +26,13 @@ export const routes: Routes = [
           title: 'Guardar'
         }
       },
+      {
+        path: 'gallery',
+        loadComponent: () => import('./gallery/gallery.component').then(m => m.GalleryComponent),
+        data: {
+          title: 'Galería'
+        }
+      },
     ]
   }
 ];

@@ -17,10 +17,10 @@ import { IconDirective } from '@coreui/icons-angular';
 import { Select2Module, Select2UpdateEvent, Select2Option } from 'ng-select2-component';
 
 import { DefaultValuesService } from '../../../shared/services/default-values.service';
-import { StickerRepositoryService } from '../../../shared/services/network/sticker-repository.service'
+import { StickerRepositoryService } from '../../../shared/services/network/sticker-repository.service';
 import { TagRepositoryService } from '../../../shared/services/network/tag-repository.service';
 import { PhotoRepositoryService } from '../../../shared/services/network/photo-repository.service';
-import { ColorClasses, Entities, Operations, ResponseTypes } from '../../../shared/enums.model';
+import { ColorClasses, EndPoints, Entities, Operations, ResponseTypes } from '../../../shared/enums.model';
 import { Sticker } from './../../../interfaces/sticker.model';
 import { Tag } from '../../../interfaces/tag.model';
 import { ModalMessageComponent } from '../../../components/modal/modal-message.component';
@@ -83,7 +83,7 @@ export class SearchComponent implements OnInit {
     this.getStickers();
     this.currentPage = 1;
     this.itemsPerTable = this.defaults.ItemsPerTable;
-    this.itemsPerPage = this.defaults.GetItemsPerPage();
+    this.itemsPerPage = this.defaults.GetItemsPerPage(EndPoints.Sticker);
   }
 
   get form() { return this.stickerForm.controls; }
@@ -165,8 +165,7 @@ export class SearchComponent implements OnInit {
       .subscribe({
         next: (response) => {
           this.stickers = response;
-          this.pagedItems = this.defaults.GetPagedItems(this.stickers, this.currentPage, this.itemsPerPage);
-          this.showPager = this.stickers.length > this.itemsPerPage;
+          this.setPager();
         },
         error: (err) => {
           const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.get, Entities.sticker);
@@ -204,7 +203,7 @@ export class SearchComponent implements OnInit {
       receivedItemsPerPage = 10;
     }
     this.currentPage = 1;
-    this.defaults.SaveItemsPerPage(receivedItemsPerPage.toString());
+    this.defaults.SaveItemsPerPage(receivedItemsPerPage.toString(), EndPoints.Sticker);
     this.itemsPerPage = receivedItemsPerPage;
     this.setPager();
   }

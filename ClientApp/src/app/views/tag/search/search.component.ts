@@ -16,7 +16,7 @@ import { IconDirective } from '@coreui/icons-angular';
 
 import { DefaultValuesService } from '../../../shared/services/default-values.service';
 import { TagRepositoryService } from '../../../shared/services/network/tag-repository.service';
-import { ColorClasses, ResponseTypes } from '../../../shared/enums.model';
+import { ColorClasses, EndPoints, ResponseTypes } from '../../../shared/enums.model';
 import { Tag } from './../../../interfaces/tag.model';
 import { ModalMessageComponent } from '../../../components/modal/modal-message.component';
 import { GridPagerComponent } from '../../../components/grid-pager/grid-pager.component';
@@ -68,7 +68,7 @@ export class SearchComponent implements OnInit {
     this.getTags();
     this.currentPage = 1;
     this.itemsPerTable = this.defaults.ItemsPerTable;
-    this.itemsPerPage = this.defaults.GetItemsPerPage();
+    this.itemsPerPage = this.defaults.GetItemsPerPage(EndPoints.Tag);
   }
 
   get form() { return this.tagForm.controls; }
@@ -124,8 +124,7 @@ export class SearchComponent implements OnInit {
       .getTags(tag)
       .subscribe(response => {
         this.tags = response;
-        this.pagedItems = this.defaults.GetPagedItems(this.tags, this.currentPage, this.itemsPerPage);
-        this.showPager = this.tags.length > this.itemsPerPage;
+        this.setPager();
       });
   }
   handlePageChange(event: number) {
@@ -140,7 +139,7 @@ export class SearchComponent implements OnInit {
       receivedItemsPerPage = 10;
     }
     this.currentPage = 1;
-    this.defaults.SaveItemsPerPage(receivedItemsPerPage.toString());
+    this.defaults.SaveItemsPerPage(receivedItemsPerPage.toString(), EndPoints.Tag);
     this.itemsPerPage = receivedItemsPerPage;
     this.setPager();
   }
