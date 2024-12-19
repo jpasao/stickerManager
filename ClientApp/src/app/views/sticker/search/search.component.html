@@ -50,7 +50,7 @@
     </c-card-header>
     <c-card-body>
       <c-row>
-        <c-col [xs]="12">
+        <c-col [xs]="12" [md]="6">
           <table cTable hover stripped bordered>
             <thead>
               <tr>
@@ -78,7 +78,7 @@
             </tbody>
           </table>
         </c-col>
-        <c-col [xs]="12">
+        <c-col [xs]="12" [md]="6">
           <table cTable bordered>
             <thead>
               <tr>
@@ -124,7 +124,7 @@
           </table>
         </c-col>
       </c-row>
-      <app-grid-pager *ngIf="showPager" [itemsPerPage]="itemsPerPage" [totalItems]="stickers.length" [currentPage]="currentPage" (pageNumber)="handlePageChange($event)"></app-grid-pager>
+      <app-grid-pager [itemsPerPage]="itemsPerPage" [totalItems]="totalItems" [currentPage]="currentPage" (pageNumber)="handlePageChange($event)"></app-grid-pager>
     </c-card-body>
   </c-card>
   <app-modal [title]="modalTitle" [message]="modalMessage" (dialogResponse)="handleDeleteModalResponse($event)"></app-modal>

@@ -59,7 +59,7 @@
         }
       </tbody>
     </table>
-    <app-grid-pager *ngIf="showPager" [itemsPerPage]="itemsPerPage" [totalItems]="tags.length" [currentPage]="currentPage" (pageNumber)="handlePageChange($event)"></app-grid-pager>
+    <app-grid-pager [itemsPerPage]="itemsPerPage" [totalItems]="tags.length" [currentPage]="currentPage" (pageNumber)="handlePageChange($event)"></app-grid-pager>
   </c-card-body>
 </c-card>
 <app-modal [title]="modalTitle" [message]="modalMessage" (dialogResponse)="handleDeleteModalResponse($event)"></app-modal>

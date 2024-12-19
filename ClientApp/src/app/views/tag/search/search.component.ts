@@ -16,11 +16,12 @@ import { IconDirective } from '@coreui/icons-angular';
 
 import { DefaultValuesService } from '../../../shared/services/default-values.service';
 import { TagRepositoryService } from '../../../shared/services/network/tag-repository.service';
-import { ColorClasses, EndPoints, ResponseTypes } from '../../../shared/enums.model';
+import { ColorClasses, EndPoints, Entities, Operations, ResponseTypes } from '../../../shared/enums.model';
 import { Tag } from './../../../interfaces/tag.model';
 import { ModalMessageComponent } from '../../../components/modal/modal-message.component';
 import { GridPagerComponent } from '../../../components/grid-pager/grid-pager.component';
 import { ShowToastService } from '../../../shared/services/show-toast.service';
+import { ErrorMessage } from '../../../interfaces/error.model';
 
 @Component({
   selector: 'app-search',
@@ -47,12 +48,12 @@ export class SearchComponent implements OnInit {
   submitted = false;
   actionIcons = { cilPencil, cilTrash };
   @ViewChild(ModalMessageComponent) modalComponent!: ModalMessageComponent;
+  @ViewChild(GridPagerComponent) pagerComponent!: GridPagerComponent;
   modalTitle: string = '';
   modalMessage: string = '';
   currentPage: number = 1;
   itemsPerPage: number = 10;
   pagedItems: Tag[] = [];
-  showPager: boolean = false;
   itemsPerTable: number[] = [];
   
   constructor(
@@ -106,25 +107,38 @@ export class SearchComponent implements OnInit {
 
     this.repository
       .deleteTag(tagToDelete)
-      .subscribe(response => {
-        if (response > ResponseTypes.NO_CHANGE) {
-          if ((this.tags.length - 1) % this.itemsPerPage === 0) {
-            this.currentPage = 1;
+      .subscribe({
+        next: (response) => {
+          if (response > ResponseTypes.NO_CHANGE) {
+            if ((this.tags.length - 1) % this.itemsPerPage === 0) {
+              this.currentPage = 1;
+            }
+            this.toast.show(toastTitle, message, ColorClasses.info);
+            this.getTags();
+          } else {
+            message = `Ha habido un problema al borrar la etiqueta '${tagToDelete.TagName}'`;
+            this.toast.show(toastTitle, message, ColorClasses.warning);
           }
-          this.toast.show(toastTitle, message, ColorClasses.info);
-          this.getTags();
-        } else {
-          message = `Ha habido un problema al borrar la etiqueta '${tagToDelete.TagName}'`;
-          this.toast.show(toastTitle, message, ColorClasses.warning);
+        },
+        error: (err) => {
+          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.delete, Entities.tag);
+          this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
         }
       });
   }
   private getTags = (tag: Tag = this.defaults.TagObject()) => {
     this.repository
       .getTags(tag)
-      .subscribe(response => {
-        this.tags = response;
-        this.setPager();
+      .subscribe({
+        next: (response) => {
+          this.tags = response;
+          this.setPager();
+          this.pagerComponent.setPageNumbers();
+        },
+        error: (err) => {
+          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.get, Entities.tag);
+          this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
+        }
       });
   }
   handlePageChange(event: number) {
@@ -141,10 +155,10 @@ export class SearchComponent implements OnInit {
     this.currentPage = 1;
     this.defaults.SaveItemsPerPage(receivedItemsPerPage.toString(), EndPoints.Tag);
     this.itemsPerPage = receivedItemsPerPage;
+    this.pagerComponent.setPageNumbers();
     this.setPager();
   }
   setPager() {
-    this.pagedItems = this.defaults.GetPagedItems(this.tags, this.currentPage, this.itemsPerPage);
-    this.showPager = this.tags.length > this.itemsPerPage;
+    this.pagedItems = this.defaults.GetPagedItems(this.tags, this.currentPage, this.itemsPerPage);    
   }
 }

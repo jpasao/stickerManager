@@ -1,4 +1,5 @@
-import { Component, input, OnInit, output } from '@angular/core';
+import { Component, input, OnInit, output, SimpleChanges } from '@angular/core';
+import { NgIf } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 import { PageItemDirective, PageLinkDirective, PaginationComponent } from '@coreui/angular';
@@ -6,7 +7,7 @@ import { PageItemDirective, PageLinkDirective, PaginationComponent } from '@core
 @Component({
   selector: 'app-grid-pager',
   standalone: true,
-  imports: [PageItemDirective, PageLinkDirective, PaginationComponent, RouterLink],
+  imports: [PageItemDirective, PageLinkDirective, PaginationComponent, RouterLink, NgIf],
   templateUrl: './grid-pager.component.html',
   styleUrl: './grid-pager.component.scss'
 })
@@ -17,15 +18,22 @@ export class GridPagerComponent implements OnInit{
   currentPage = input<number>(1);
   pageNumber = output<number>();
   pageNumbers: number[] = [];
+  innerItemsPerPage: number = 10;
+  innerTotalItems: number = 0;
+  show: boolean = false;
 
   ngOnInit(): void {
-    this.initializePageNumbers();
+    this.innerItemsPerPage = this.itemsPerPage();
+    this.innerTotalItems = this.totalItems();
+    this.setPageNumbers();
   }
 
-  initializePageNumbers(): void {
-    for (let i = 1; i <= Math.ceil(this.totalItems() / this.itemsPerPage()); i++) {
+  setPageNumbers(): void {
+    this.pageNumbers = [];
+    for (let i = 1; i <= Math.ceil(this.innerTotalItems / this.innerItemsPerPage); i++) {
       this.pageNumbers.push(i);
-    }   
+    }
+    this.show = this.innerTotalItems > this.innerItemsPerPage;
   }
 
   setCurrentPage(page: any) {
@@ -37,4 +45,10 @@ export class GridPagerComponent implements OnInit{
     }
     this.pageNumber.emit(pageNumber);
   }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['itemsPerPage']) this.innerItemsPerPage = changes['itemsPerPage'].currentValue;
+    if (changes['totalItems']) this.innerTotalItems = changes['totalItems'].currentValue;
+    this.setPageNumbers();
+  } 
 }

@@ -56,13 +56,14 @@ export class SearchComponent implements OnInit {
   submitted = false;
   actionIcons = { cilPencil, cilTrash, cilFeaturedPlaylist };
   @ViewChild(ModalMessageComponent) modalComponent!: ModalMessageComponent;
+  @ViewChild(GridPagerComponent) pagerComponent!: GridPagerComponent;
   modalTitle: string = '';
   modalMessage: string = '';
   currentPage: number = 1;
   itemsPerPage: number = 10;
   pagedItems: Sticker[] = [];
-  showPager: boolean = false;
   itemsPerTable: number[] = [];
+  totalItems: number = 0;
   showDetails: boolean = false;
   stickerImage: string = '';
   hasTags: boolean = false;
@@ -146,16 +147,22 @@ export class SearchComponent implements OnInit {
 
     this.stickerRepository
       .deleteSticker(stickerToDelete)
-      .subscribe(response => {
-        if (response > ResponseTypes.NO_CHANGE) {
-          if ((this.stickers.length - 1) % this.itemsPerPage === 0) {
-            this.currentPage = 1;
+      .subscribe({
+        next: (response) => {
+          if (response > ResponseTypes.NO_CHANGE) {
+            if ((this.stickers.length - 1) % this.itemsPerPage === 0) {
+              this.currentPage = 1;
+            }
+            this.toast.show(toastTitle, message, ColorClasses.info);
+            this.getStickers();
+          } else {
+            message = `Ha habido un problema al borrar la pegatina '${stickerToDelete.StickerName}'`;
+            this.toast.show(toastTitle, message, ColorClasses.warning);
           }
-          this.toast.show(toastTitle, message, ColorClasses.info);
-          this.getStickers();
-        } else {
-          message = `Ha habido un problema al borrar la pegatina '${stickerToDelete.StickerName}'`;
-          this.toast.show(toastTitle, message, ColorClasses.warning);
+        },
+        error: (err) => {
+          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.delete, Entities.sticker);
+          this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
         }
       });
   }
@@ -165,11 +172,8 @@ export class SearchComponent implements OnInit {
       .subscribe({
         next: (response) => {
           this.stickers = response;
+          this.totalItems = response.length;
           this.setPager();
-        },
-        error: (err) => {
-          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.get, Entities.sticker);
-          this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
         }
       });
   }
@@ -208,8 +212,8 @@ export class SearchComponent implements OnInit {
     this.setPager();
   }
   setPager() {
+    this.pagerComponent.setPageNumbers();
     this.pagedItems = this.defaults.GetPagedItems(this.stickers, this.currentPage, this.itemsPerPage);
-    this.showPager = this.stickers.length > this.itemsPerPage;
   }
   getRowColor(sticker: Sticker) {
     if (sticker === undefined || this.stickerToHandle === undefined) return '';

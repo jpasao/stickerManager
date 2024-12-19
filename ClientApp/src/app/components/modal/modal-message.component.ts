@@ -21,7 +21,6 @@ export class ModalMessageComponent {
   visible = false;
   title = input<string>('');
   message = input<string>('');
-  
   dialogResponse = output<boolean>();
 
   handleDialogResponse(response: boolean) {

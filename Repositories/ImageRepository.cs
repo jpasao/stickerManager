@@ -1,5 +1,6 @@
 using System.Data;
 using Dapper;
+using Dapper.SimpleSqlBuilder;
 using Microsoft.Extensions.Options;
 using MySqlConnector;
 using sticker.Code;
@@ -30,16 +31,17 @@ public class ImageRepository(IOptions<ConnectionString> connectionStrings) : IIm
         }
     }
 
-    public async Task<IResult> GetThumbnails(Page page)
+    public async Task<IResult> GetThumbnails(Gallery filters)
     {
         try
         {
-            var start = page.Start - 1;
-            var sql = @$"SELECT I.IdImage, I.StickerThumbnail, S.StickerName
+            var start = filters.Start - 1;
+            var builder = SimpleBuilder.Create($@"SELECT I.IdImage, I.StickerThumbnail, S.StickerName
                          FROM images I
                             INNER JOIN stickers S ON I.IdSticker = S.IdSticker
-                         LIMIT {start},{page.Size}";
-            var response = (await db.QueryAsync<Image>(sql).ConfigureAwait(false)).AsList();
+                         LIMIT {start},{filters.Size}");
+
+            var response = (await db.QueryAsync<Image>(builder.Sql, builder.Parameters).ConfigureAwait(false)).AsList();
 
             return Response.BuildResponse(response);
         }

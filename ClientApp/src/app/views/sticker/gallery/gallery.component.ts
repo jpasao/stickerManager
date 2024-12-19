@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 
@@ -18,6 +18,7 @@ import { GridPagerComponent } from '../../../components/grid-pager/grid-pager.co
 import { ErrorMessage } from '../../../interfaces/error.model';
 import { ShowToastService } from '../../../shared/services/show-toast.service';
 import { Photo } from '../../../interfaces/photo.model';
+import { Gallery } from '../../../interfaces/gallery.model';
 
 @Component({
   selector: 'app-gallery',
@@ -40,9 +41,9 @@ export class GalleryComponent implements OnInit{
   images: Photo[] = [];
   currentPage: number = 1;
   itemsPerPage: number = 10;
-  showPager: boolean = false;
   itemsPerTable: number[] = [];
   totalItems: number = 0;
+  @ViewChild(GridPagerComponent) pagerComponent!: GridPagerComponent;
 
   constructor(
     private photoRepository: PhotoRepositoryService,
@@ -72,8 +73,14 @@ export class GalleryComponent implements OnInit{
   private getThumbnails = (start: number, size: number) => {
     const startNumber: number = ((start - 1) * size) + 1 || 1;
     const sizeNumber: number = size || 10;
+    const filters: Gallery = {
+      Start: startNumber,
+      Size: sizeNumber,
+      Ascending: true,
+      Sticker: this.defaults.StickerObject()
+    };
     this.photoRepository
-      .getThumbnails(startNumber, sizeNumber)
+      .getThumbnails(filters)
       .subscribe({
         next: (response) => {
           this.images = response.map((image) => {
@@ -86,7 +93,7 @@ export class GalleryComponent implements OnInit{
               StickerName: image.StickerName
             }
           });
-          this.showPager = this.totalItems > this.itemsPerPage;
+          this.pagerComponent.setPageNumbers();
         },
         error: (err) => {
           const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.get, Entities.photo);
@@ -97,7 +104,7 @@ export class GalleryComponent implements OnInit{
   handlePageChange(event: number) {
     if (event) {
       this.currentPage = event;
-      this.setPager();
+      this.getThumbnails(this.currentPage, this.itemsPerPage);
     }
   }
   handleChangeTableRows(event: any) {
@@ -108,10 +115,7 @@ export class GalleryComponent implements OnInit{
     this.currentPage = 1;
     this.defaults.SaveItemsPerPage(receivedItemsPerPage.toString(), EndPoints.Thumbnail);
     this.itemsPerPage = receivedItemsPerPage;
-    this.setPager();
-  }
-  setPager() {
+    this.pagerComponent.setPageNumbers();
     this.getThumbnails(this.currentPage, this.itemsPerPage);
-    this.showPager = this.totalItems > this.itemsPerPage;
   }
 }

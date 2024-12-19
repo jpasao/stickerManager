@@ -24,7 +24,7 @@ public class ImageController : ControllerBase
     }
 
     [HttpPost("Thumbnails")]
-    public async Task<IResult> GetThumbnails(Page page)
+    public async Task<IResult> GetThumbnails(Gallery page)
     {
         return await repository.GetThumbnails(page);
     }

@@ -1,13 +1,13 @@
 <c-pagination aria-label="Paginación">
-    <li cPageItem [disabled]="currentPage() === 1">
-      <a cPageLink (click)="setCurrentPage('P')">Previo</a>
+    <li cPageItem [disabled]="currentPage() === 1" *ngIf="show">
+        <a cPageLink (click)="setCurrentPage('P')">Previo</a>
     </li>
     @for(item of pageNumbers; track item) {
-        <li cPageItem [active]="currentPage() === item">
+      <li cPageItem [active]="currentPage() === item" *ngIf="show">
           <a cPageLink (click)="setCurrentPage(item)">{{item}}</a>
-        </li>
+      </li>
     }
-    <li cPageItem [disabled]="currentPage() === pageNumbers.length">
-      <a cPageLink (click)="setCurrentPage('N')">Siguiente</a>
+    <li cPageItem [disabled]="currentPage() === pageNumbers.length" *ngIf="show">
+        <a cPageLink (click)="setCurrentPage('N')">Siguiente</a>
     </li>
-  </c-pagination>
+</c-pagination>

@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Sticker } from '../../../interfaces/sticker.model'; 
 import { Photo } from '../../../interfaces/photo.model';
+import { Gallery } from '../../../interfaces/gallery.model'; 
 import { ApiAddresses, EndPoints } from '../../enums.model';
 import { RequestHelperService } from './request-helper.service';
 
@@ -21,10 +22,10 @@ export class PhotoRepositoryService {
     );
   }
 
-  public getThumbnails = (start: number, size: number) => {
+  public getThumbnails = (filter: Gallery) => {
     return this.http.post<Photo[]>(
       this.request.createCompleteRoute(ApiAddresses.Image, EndPoints.Thumbnail),
-      { Start: start, Size: size }
+      filter
     );
   }
 

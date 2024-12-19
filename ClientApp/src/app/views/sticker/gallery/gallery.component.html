@@ -24,6 +24,6 @@
                 </c-col>
             }
         </c-row>
-        <app-grid-pager *ngIf="showPager" [itemsPerPage]="itemsPerPage" [totalItems]="totalItems" [currentPage]="currentPage" (pageNumber)="handlePageChange($event)"></app-grid-pager>
+        <app-grid-pager [itemsPerPage]="itemsPerPage" [totalItems]="totalItems" [currentPage]="currentPage" (pageNumber)="handlePageChange($event)"></app-grid-pager>
     </c-card-body>
 </c-card>

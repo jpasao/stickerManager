@@ -6,7 +6,7 @@ interface IImageRepository
 {
     Task<IResult> GetImages(int idSticker);
 
-    Task<IResult> GetThumbnails(Page page);
+    Task<IResult> GetThumbnails(Gallery filters);
 
     Task<IResult> SaveImage(int idSticker, List<IFormFile> images);
 

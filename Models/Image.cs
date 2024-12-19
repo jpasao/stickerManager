@@ -18,8 +18,12 @@ public class Image
     public required byte[] StickerThumbnail { get; set; }
 }
 
-public record Page
+public record Gallery
 {
-    public short Start { get; set; }
-    public short Size { get; set; }
+    public int Start { get; set; }
+    public int Size { get; set; }
+
+    public bool Ascending { get; set; }
+
+    public Sticker Sticker { get; set; }
 }
