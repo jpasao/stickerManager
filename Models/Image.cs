@@ -25,5 +25,7 @@ public record Gallery
 
     public bool Ascending { get; set; }
 
+    public bool OrderByName { get; set; }
+
     public Sticker Sticker { get; set; }
 }

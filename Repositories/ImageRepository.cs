@@ -1,6 +1,5 @@
 using System.Data;
 using Dapper;
-using Dapper.SimpleSqlBuilder;
 using Microsoft.Extensions.Options;
 using MySqlConnector;
 using sticker.Code;
@@ -36,12 +35,39 @@ public class ImageRepository(IOptions<ConnectionString> connectionStrings) : IIm
         try
         {
             var start = filters.Start - 1;
-            var builder = SimpleBuilder.Create($@"SELECT I.IdImage, I.StickerThumbnail, S.StickerName
-                         FROM images I
-                            INNER JOIN stickers S ON I.IdSticker = S.IdSticker
-                         LIMIT {start},{filters.Size}");
+            var tagList = filters.Sticker?.Tag?.Select(t => t.IdTag).ToArray();
+            var strTagList = string.Join(",", tagList);
+            var orderCriterium = filters.Ascending ? "ASC" : "DESC";
+            var nameCriterium = filters.OrderByName ? "S.StickerName" : "I.IdImage";
+            var orderByCriterium = $"{nameCriterium} {orderCriterium}";
 
-            var response = (await db.QueryAsync<Image>(builder.Sql, builder.Parameters).ConfigureAwait(false)).AsList();
+            var builder = new SqlBuilder();
+            var name = filters.Sticker.StickerName;
+
+            var sql = @$"SELECT DISTINCT 
+                    I.IdImage, I.StickerThumbnail, S.StickerName
+                FROM images I
+                    INNER JOIN stickers S ON I.IdSticker = S.IdSticker
+                    LEFT JOIN stickertags T ON T.IdSticker = I.IdSticker
+                /**where**/ 
+                /**orderby**/
+                LIMIT @Limit OFFSET @Offset";
+            var template = builder.AddTemplate(sql);
+            builder.Where("1=1");
+            if (filters.Sticker.StickerName.Length > 0) {
+                builder.Where($"S.StickerName LIKE '%{name}%'", new { name });
+            }
+            if (filters.Sticker?.Tag?.First().IdTag != 0) {
+                builder.Where($"T.IdTag IN ({strTagList})", new { strTagList });
+            }
+            builder.OrderBy($"{orderByCriterium}");
+            builder.AddParameters(parameters: new 
+            {
+                Limit = filters.Size,
+                Offset = start
+            });
+
+            var response = await db.QueryAsync<Image>(template.RawSql, template.Parameters);
 
             return Response.BuildResponse(response);
         }

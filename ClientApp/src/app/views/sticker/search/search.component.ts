@@ -6,7 +6,7 @@ import { NgIf } from '@angular/common';
 import { cilPencil, cilTrash, cilFeaturedPlaylist } from '@coreui/icons';
 import {
   CardComponent, CardHeaderComponent, CardBodyComponent, ImgDirective,
-  ButtonDirective,
+  ButtonDirective, ButtonGroupComponent, InputGroupComponent, InputGroupTextDirective,
   FormSelectDirective,
   TableDirective, TableColorDirective,
   RowComponent, ColComponent,
@@ -33,7 +33,7 @@ import { ShowToastService } from '../../../shared/services/show-toast.service';
   standalone: true,
   imports: [
     CardComponent, CardHeaderComponent, CardBodyComponent, ImgDirective,
-    ButtonDirective,
+    ButtonDirective, ButtonGroupComponent, InputGroupComponent, InputGroupTextDirective,
     FormSelectDirective,
     TableDirective, TableColorDirective,
     RowComponent, ColComponent, 
@@ -51,7 +51,7 @@ import { ShowToastService } from '../../../shared/services/show-toast.service';
 export class SearchComponent implements OnInit {
   stickers: Sticker[] = [];
   tags: Select2Option[] = [];
-  stickerToHandle: Sticker = this.defaults.StickerObject();
+  stickerToHandle!: Sticker;
   stickerForm!: FormGroup;
   submitted = false;
   actionIcons = { cilPencil, cilTrash, cilFeaturedPlaylist };
@@ -79,6 +79,7 @@ export class SearchComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.stickerToHandle = this.defaults.StickerObject();
     this.stickerForm = this.formBuilder.group({ name: [""], tag: [""] });
     this.getTags();
     this.getStickers();

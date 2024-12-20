@@ -6,7 +6,7 @@ import { NgIf } from '@angular/common';
 import { cilPencil, cilTrash } from '@coreui/icons';
 import { 
   CardComponent, CardHeaderComponent, CardBodyComponent,
-  ButtonDirective,
+  ButtonDirective, ButtonGroupComponent, InputGroupComponent, InputGroupTextDirective,
   FormSelectDirective,
   TableDirective,
   RowComponent, ColComponent,
@@ -28,7 +28,7 @@ import { ErrorMessage } from '../../../interfaces/error.model';
   standalone: true,
   imports: [
     CardComponent, CardHeaderComponent, CardBodyComponent,
-    ButtonDirective,
+    ButtonDirective, ButtonGroupComponent, InputGroupComponent, InputGroupTextDirective,
     FormSelectDirective,
     TableDirective,
     RowComponent, ColComponent,

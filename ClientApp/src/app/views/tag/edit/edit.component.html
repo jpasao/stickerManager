@@ -7,14 +7,14 @@
             <c-card-body>
                 <form #customStylesForm="ngForm" cForm (ngSubmit)="onSubmit()" [formGroup]="tagEditForm" [validated]="formValidated" class="needs-validation" novalidate>
                     <c-row gutter="3" class="align-items-center">
-                        <c-col xs="3" md="auto">
-                            <label cLabel for="name">Nombre</label>
+                        <c-col xs="11">
+                            <c-input-group class="flex-nowrap">
+                                <span cInputGroupText>Nombre</span>
+                                <input cFormControl formControlName="name" type="text" required id="name">
+                                <c-form-feedback [valid]="formValidated" *ngIf="!saving">¿Qué cosa fuera la etiqueta sin nombre?</c-form-feedback>
+                            </c-input-group>
                         </c-col>
-                        <c-col xs="9" [md]="getWidth()">
-                            <input cFormControl formControlName="name" type="text" required id="name">
-                            <c-form-feedback [valid]="formValidated" *ngIf="!saving">¿Qué cosa fuera la etiqueta sin nombre?</c-form-feedback>
-                        </c-col>
-                        <c-col xs="12" md="auto">
+                        <c-col xs="1">
                             <input cButton color="primary" type="submit" value="Guardar" class="alignRight">
                         </c-col>
                     </c-row> 

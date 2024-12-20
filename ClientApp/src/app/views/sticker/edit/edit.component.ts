@@ -5,7 +5,7 @@ import { NgIf } from '@angular/common';
 
 import { 
   CardComponent, CardHeaderComponent, CardBodyComponent, ImgDirective,
-  ButtonDirective,
+  ButtonDirective, ButtonGroupComponent,
   TableDirective,
   RowComponent, ColComponent,
   FormDirective, FormLabelDirective, FormControlDirective, FormFeedbackComponent,
@@ -33,7 +33,7 @@ import { ShowToastService } from '../../../shared/services/show-toast.service';
   standalone: true,
   imports: [
     CardComponent, CardHeaderComponent, CardBodyComponent, ImgDirective,
-    ButtonDirective,
+    ButtonDirective, ButtonGroupComponent,
     TableDirective,
     RowComponent, ColComponent,
     FormDirective, FormLabelDirective, FormControlDirective, FormsModule, ReactiveFormsModule, FormFeedbackComponent,
@@ -48,7 +48,7 @@ import { ShowToastService } from '../../../shared/services/show-toast.service';
   styleUrl: './edit.component.scss'
 })
 export class EditComponent implements OnInit {
-  receivedSticker: Sticker = this.defaults.StickerObject();
+  receivedSticker!: Sticker;
   tags: Select2Option[] = [];
   stickerTags: number[] = [];
   stickerImage!: Photo;
@@ -70,6 +70,7 @@ export class EditComponent implements OnInit {
     private defaults: DefaultValuesService,
     private formBuilder: FormBuilder,
     private toast: ShowToastService) {
+    this.receivedSticker = this.defaults.StickerObject();
     const receivedData = this.router.getCurrentNavigation()?.extras.state as Sticker || {};
     const hasData = Object.keys(receivedData).length > 0;
     if (hasData) {

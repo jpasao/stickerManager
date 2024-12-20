@@ -8,24 +8,24 @@
     <c-card-body>
       <form cForm (ngSubmit)="onSubmit()" [formGroup]="stickerForm">
         <c-row gutter="3" class="align-items-center">
-          <c-col xs="3" md="auto">
-            <label cLabel class="col" for="name">Nombre</label>
+          <c-col xs="12" md="6">
+            <c-input-group class="flex-nowrap">
+              <span cInputGroupText>Nombre</span>
+              <input cFormControl type="text" formControlName="name" />
+            </c-input-group>
           </c-col>
-          <c-col xs="9" md="5">
-            <input cFormControl type="text" formControlName="name" />
-          </c-col>
-          <c-col xs="3" md="auto">
-            <label cLabel class="col" for="name">Etiquetas</label>
-          </c-col>
-          <c-col xs="9" md="4">
-            <select2 formControlName="tag" multiple="true"
-              [data]="tags"  
-              noResultMessage="Enter para crear una nueva etiqueta" 
-              (autoCreateItem)="handleCreateTag($event)" 
-              resetSelectedValue=""
-              autoCreate 
-              resettable>
-            </select2>
+          <c-col xs="12" md="5">
+            <c-input-group class="flex-nowrap">
+              <span cInputGroupText>Etiquetas</span>
+              <select2 formControlName="tag" multiple="true" class="wideSelect"
+                [data]="tags"
+                noResultMessage="Enter para crear una nueva etiqueta" 
+                (autoCreateItem)="handleCreateTag($event)" 
+                resetSelectedValue=""
+                autoCreate 
+                resettable>
+              </select2>
+            </c-input-group>
           </c-col>
           <c-col xs="12" md="1">
             <button cButton type="submit" class="float-end">Buscar</button>

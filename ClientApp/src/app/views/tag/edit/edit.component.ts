@@ -5,7 +5,7 @@ import { NgIf } from '@angular/common';
 
 import { 
   CardComponent, CardHeaderComponent, CardBodyComponent,
-  ButtonDirective,
+  ButtonDirective, ButtonGroupComponent,
   TableDirective,
   RowComponent, ColComponent,
   FormDirective, FormLabelDirective, FormControlDirective, FormFeedbackComponent,
@@ -27,7 +27,7 @@ import { ShowToastService } from '../../../shared/services/show-toast.service';
   standalone: true,
   imports: [
     CardComponent, CardHeaderComponent, CardBodyComponent,
-    ButtonDirective,
+    ButtonDirective, ButtonGroupComponent,
     TableDirective,
     RowComponent, ColComponent,
     FormDirective, FormLabelDirective, FormControlDirective, FormsModule, ReactiveFormsModule, FormFeedbackComponent,
@@ -40,7 +40,7 @@ import { ShowToastService } from '../../../shared/services/show-toast.service';
   styleUrl: './edit.component.scss'
 })
 export class EditComponent implements OnInit {
-  receivedTag: Tag = this.defaults.TagObject();
+  receivedTag!: Tag;
   isEditing: boolean;
   tagEditForm!: FormGroup;
   savePlaceholder: string;
@@ -54,6 +54,7 @@ export class EditComponent implements OnInit {
     private defaults: DefaultValuesService,
     private formBuilder: FormBuilder,
     private toast: ShowToastService) {
+    this.receivedTag = this.defaults.TagObject();
     const receivedData = this.router.getCurrentNavigation()?.extras.state as Tag || {};
     const hasData = Object.keys(receivedData).length > 0;
     if (hasData) {

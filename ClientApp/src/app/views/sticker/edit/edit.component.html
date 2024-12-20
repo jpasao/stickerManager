@@ -9,28 +9,28 @@
                 <c-col xs="12" md="6">
                   <form #customStylesForm="ngForm" cForm (ngSubmit)="onSubmit()" [formGroup]="stickerEditForm" [validated]="formValidated" class="needs-validation" novalidate>
                     <c-row class="my-3">
-                      <c-col xs="3" md="2">
-                        <label cLabel class="col" for="name">Nombre</label>
-                      </c-col>
-                      <c-col xs="9" md="10">
-                        <input cFormControl type="text" formControlName="name" />
-                        <c-form-feedback [valid]="formValidated" *ngIf="!saving">¿Y cómo vas a buscar luego la pegatina?</c-form-feedback>
+                      <c-col xs="12">
+                        <c-input-group class="flex-nowrap">
+                          <span cInputGroupText>Nombre</span>
+                          <input cFormControl type="text" formControlName="name" class="wideSelect" />
+                          <c-form-feedback [valid]="formValidated" *ngIf="!saving">¿Y cómo vas a buscar luego la pegatina?</c-form-feedback>
+                        </c-input-group>
                       </c-col>
                     </c-row>
                     <c-row class="my-3">
-                      <c-col xs="3" md="2">
-                        <label cLabel class="col" for="name">Etiquetas</label>
-                      </c-col>
-                      <c-col xs="9" md="10">
-                        <select2 formControlName="tag" multiple="true"
-                          [data]="tags"
-                          noResultMessage="Enter para crear una nueva etiqueta" 
-                          (autoCreateItem)="handleCreateTag($event)"
-                          [value]="stickerTags"
-                          resetSelectedValue=""
-                          autoCreate 
-                          resettable>
-                        </select2>
+                      <c-col xs="12">
+                        <c-input-group class="flex-nowrap">
+                          <span cInputGroupText>Etiquetas</span>
+                          <select2 formControlName="tag" multiple="true" class="wideSelect"
+                            [data]="tags"
+                            noResultMessage="Enter para crear una nueva etiqueta" 
+                            (autoCreateItem)="handleCreateTag($event)"
+                            [value]="stickerTags"
+                            resetSelectedValue=""
+                            autoCreate 
+                            resettable>
+                          </select2>
+                        </c-input-group>
                       </c-col>
                     </c-row>
                     <c-row>
