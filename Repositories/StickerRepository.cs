@@ -107,19 +107,20 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
                 if (!isNewSticker)
                 {
                     sql = "DELETE FROM stickertags WHERE IdSticker = @IdSticker";
-                    stickerTagDelete = await db.ExecuteAsync(sql, sticker).ConfigureAwait(true);
+                    stickerTagDelete = await db.ExecuteAsync(sql, sticker).ConfigureAwait(false);
                 }
 
                 using var connection = new MySqlConnection(connectionStrings.Value.StickerConnectionString);
+
                 sql = "INSERT INTO stickertags (IdTag, IdSticker) VALUES (@IdTag, @IdSticker)";
                 var stickerTags = sticker.Tag.Select(obj => new {
                     obj.IdTag,
-                    sticker.IdSticker
+                    IdSticker = stickerId
                 });
                 stickerTagInsert = await connection.ExecuteAsync(sql, stickerTags);
             }
 
-            var response = stickerSave + stickerTagDelete + stickerTagInsert;
+            var response = isNewSticker ? stickerId : stickerSave + stickerTagDelete + stickerTagInsert;
 
             return Response.BuildResponse(response); 
         }

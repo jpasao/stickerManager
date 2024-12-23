@@ -211,7 +211,7 @@ export class EditComponent implements OnInit {
     if (name.length === 0) {
       return;
     }
-    const tagsToSave = tags[0].IdTag === undefined
+    const tagsToSave = tags.length > 0
       ? tags.map((tag: any) => {
         let num = tag;
         if (isNaN(parseInt(num.toString()))) {

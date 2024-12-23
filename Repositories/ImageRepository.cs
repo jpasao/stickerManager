@@ -45,7 +45,7 @@ public class ImageRepository(IOptions<ConnectionString> connectionStrings) : IIm
             var name = filters.Sticker.StickerName;
 
             var sql = @$"SELECT DISTINCT 
-                    I.IdImage, I.StickerThumbnail, S.StickerName
+                    I.IdImage, I.IdSticker, I.StickerThumbnail, S.StickerName
                 FROM images I
                     INNER JOIN stickers S ON I.IdSticker = S.IdSticker
                     LEFT JOIN stickertags T ON T.IdSticker = I.IdSticker

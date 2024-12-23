@@ -27,7 +27,7 @@
             </c-row>
         </form>
         <br />
-        <form cForm (ngSubmit)="onSubmit()" [formGroup]="radioForm">
+        <form cForm (ngSubmit)="handleSubmit()" [formGroup]="radioForm">
             <c-row>
                 <c-col xs="12" md="6">
                     <c-input-group class="flex-nowrap">
@@ -80,7 +80,21 @@
             @for(image of images; track image?.IdImage) {
             <c-col class="my-2">
                 <c-card [cBorder]="{ top: { color: 'secondary', width: 3 }}" class="h-100">
-                    <c-card-header>{{image.StickerName}}</c-card-header>
+                    <c-card-header class="galleryCard">
+                        <c-row>
+                            <c-col>
+                                <span class="cardTitle">{{image.StickerName}}</span>
+                            </c-col>
+                            <c-col class="galleryActionButtons">
+                                <button cButton color="warning" variant="ghost" size="sm" (click)="onEdit(image)">
+                                    <svg [cIcon]="actionIcons.cilPencil"></svg>
+                                </button>
+                                <button cButton color="danger" variant="ghost" size="sm" (click)="openDeleteModal(image)">
+                                    <svg [cIcon]="actionIcons.cilTrash"></svg>
+                                </button>
+                            </c-col>
+                        </c-row>
+                    </c-card-header>
                     <c-card-body style="text-align: center;">
                         <img cCardImg [src]="image?.StickerThumbnail" style="max-width: 100%;" />
                     </c-card-body>
@@ -92,3 +106,4 @@
             (pageNumber)="handlePageChange($event)"></app-grid-pager>
     </c-card-body>
 </c-card>
+<app-modal [title]="modalTitle" [message]="modalMessage" (dialogResponse)="handleDeleteModalResponse($event)"></app-modal>

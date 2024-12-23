@@ -175,6 +175,10 @@ export class SearchComponent implements OnInit {
           this.stickers = response;
           this.totalItems = response.length;
           this.setPager();
+        },
+        error: (err) => {
+          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.get, Entities.sticker);
+          this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
         }
       });
   }

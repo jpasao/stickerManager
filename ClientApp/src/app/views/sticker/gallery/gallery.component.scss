@@ -1,0 +1,16 @@
+.cardTitle {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;  
+    overflow: hidden;
+}
+.galleryActionButtons {
+    display: none;
+}
+.galleryCard {
+    min-height: 48px;
+}
+.galleryCard:hover .galleryActionButtons {
+    display: inline;
+}
