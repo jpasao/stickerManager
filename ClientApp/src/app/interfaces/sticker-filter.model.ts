@@ -1,6 +1,6 @@
 import { Sticker } from './sticker.model';
 
-export interface Gallery {
+export interface StickerFilter {
     Start: number;
     Size: number;
     OrderByName: boolean;

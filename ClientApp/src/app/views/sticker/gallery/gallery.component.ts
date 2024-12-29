@@ -15,21 +15,22 @@ import {
 } from '@coreui/angular';
 import { IconDirective } from '@coreui/icons-angular';
 import { cilPencil, cilTrash } from '@coreui/icons';
+import { Select2Module, Select2UpdateEvent, Select2Option } from 'ng-select2-component';
 
 import { DefaultValuesService } from '../../../shared/services/default-values.service';
+import { StickerRepositoryService } from '../../../shared/services/network/sticker-repository.service';
 import { PhotoRepositoryService } from '../../../shared/services/network/photo-repository.service';
+import { TagRepositoryService } from '../../../shared/services/network/tag-repository.service';
 import { ColorClasses, EndPoints, Entities, Operations, ResponseTypes } from '../../../shared/enums.model';
-import { GridPagerComponent } from '../../../components/grid-pager/grid-pager.component';
-import { ErrorMessage } from '../../../interfaces/error.model';
-import { ShowToastService } from '../../../shared/services/show-toast.service';
 import { Photo } from '../../../interfaces/photo.model';
-import { Gallery } from '../../../interfaces/gallery.model';
-import { Select2Module, Select2UpdateEvent, Select2Option  } from 'ng-select2-component';
 import { Sticker } from '../../../interfaces/sticker.model';
 import { Tag } from '../../../interfaces/tag.model';
-import { StickerRepositoryService } from '../../../shared/services/network/sticker-repository.service';
-import { TagRepositoryService } from '../../../shared/services/network/tag-repository.service';
+import { StickerFilter } from '../../../interfaces/sticker-filter.model';
 import { ModalMessageComponent } from '../../../components/modal/modal-message.component';
+import { GridPagerComponent } from '../../../components/grid-pager/grid-pager.component';
+import { StickerFilterComponent } from '../../../components/sticker-filter/sticker-filter.component'
+import { ErrorMessage } from '../../../interfaces/error.model';
+import { ShowToastService } from '../../../shared/services/show-toast.service';
 
 @Component({
   selector: 'app-gallery',
@@ -42,11 +43,12 @@ import { ModalMessageComponent } from '../../../components/modal/modal-message.c
     TableDirective, TableColorDirective,
     RowComponent, ColComponent,
     FormDirective, FormLabelDirective, FormControlDirective, FormsModule, ReactiveFormsModule, FormCheckLabelDirective,
+    ModalMessageComponent,
+    StickerFilterComponent,
     GridPagerComponent,
     NgIf,
     ContainerComponent,
-    Select2Module,
-    ModalMessageComponent
+    Select2Module
   ],
   templateUrl: './gallery.component.html',
   styleUrl: './gallery.component.scss'
@@ -54,7 +56,7 @@ import { ModalMessageComponent } from '../../../components/modal/modal-message.c
 export class GalleryComponent implements OnInit{
   images: Photo[] = [];
   tags: Select2Option[] = [];
-  stickerForm!: FormGroup;
+  search!: StickerFilter;
   submitted = false;
   actionIcons = { cilPencil, cilTrash };
   currentPage: number = 1;
@@ -77,21 +79,17 @@ export class GalleryComponent implements OnInit{
     private tagRepository: TagRepositoryService,
     private stickerRepository: StickerRepositoryService,
     private defaults: DefaultValuesService,
-    private formBuilder: FormBuilder,
     private router: Router,
     private toast: ShowToastService
   ){ }
 
   ngOnInit(): void {
-    this.stickerForm = this.formBuilder.group({name: [""], tag: [""]});
     this.itemsPerPage = this.defaults.GetItemsPerPage(EndPoints.Thumbnail);
     this.countPhotos();
     this.getTags();
-    this.handleSubmit();
+    this.getThumbnails();
     this.itemsPerTable = this.defaults.ItemsPerTable;
   }
-
-  get form() { return this.stickerForm.controls; }
 
   private countPhotos() {
     this.photoRepository
@@ -104,47 +102,17 @@ export class GalleryComponent implements OnInit{
         }
       });
   }
-  setFieldValue(value: string): void {
-    this.radioForm.patchValue({ field: value });
-  }
-  setAscendingValue(value: string): void {
-    this.radioForm.patchValue({ ascend: value });
-  }
-  handleSubmit() {
+  getFilters(event: StickerFilter) {
     this.submitted = true;
-    const gallerySearch = this.getFilters();
-    this.getThumbnails(gallerySearch);
-  }
-  private getFilters(): Gallery {
-    const selectedTags = this.form['tag'].value;
-    let tagObject: Tag[] = [this.defaults.TagObject()];
-    if (selectedTags) {
-      tagObject = selectedTags.map((tag: string) => {
-        return {
-          IdTag: tag,
-          TagName: ''
-        }
-      });
-    }
-    return {
-      Start: this.currentPage,
-      Size: this.itemsPerPage,
-      OrderByName: this.radioForm.controls['field'].value === 'name',
-      Ascending: this.radioForm.controls['ascend'].value === 'asc',
-      Sticker: {
-        IdSticker: 0,
-        StickerName: this.form['name'].value || '',
-        Tag: tagObject
-      }
+    if (event) {
+      this.search = event;
+      this.getThumbnails(event);
     }
   }
-  onReset() {
-    this.submitted = false;
-    this.stickerForm.reset();
-  }
-  private getThumbnails = (filters: Gallery) => {
+  private getThumbnails = (filters: StickerFilter = this.defaults.FilterObject()) => {
+    const pagedSearch: StickerFilter = { ...filters, Start: this.currentPage, Size: this.itemsPerPage};
     this.photoRepository
-      .getThumbnails(filters)
+      .getThumbnails(pagedSearch)
       .subscribe({
         next: (response) => {
           this.images = response.map((image) => {
@@ -204,7 +172,7 @@ export class GalleryComponent implements OnInit{
   handlePageChange(event: number) {
     if (event) {
       this.currentPage = event;
-      this.handleSubmit();
+      this.getThumbnails();
     }
   }
   handleChangeTableRows(event: any) {
@@ -216,7 +184,7 @@ export class GalleryComponent implements OnInit{
     this.defaults.SaveItemsPerPage(receivedItemsPerPage.toString(), EndPoints.Thumbnail);
     this.itemsPerPage = receivedItemsPerPage;
     this.pagerComponent.setPageNumbers();
-    this.handleSubmit();
+    this.getThumbnails();
   }
   handleCreateTag(event: Select2UpdateEvent<any>) {
     if (event === null || event.value.value.length === 0) return;
@@ -282,8 +250,7 @@ export class GalleryComponent implements OnInit{
               next: (response) => {
                 if (response > ResponseTypes.NO_CHANGE) {
                   this.toast.show(toatsTitle, message, ColorClasses.info);
-                  this.handleSubmit();
-      
+                  this.getThumbnails();
                 } else {
                   message = `Ha habido un problema al borrar la pegatina '${this.imageToHandle.StickerName}'`;
                   this.toast.show(toatsTitle, message, ColorClasses.warning);
@@ -294,7 +261,6 @@ export class GalleryComponent implements OnInit{
                 this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
               }
             });
-
         }
       })
   }

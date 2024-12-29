@@ -23,8 +23,10 @@ import { PhotoRepositoryService } from '../../../shared/services/network/photo-r
 import { ColorClasses, EndPoints, Entities, Operations, ResponseTypes } from '../../../shared/enums.model';
 import { Sticker } from './../../../interfaces/sticker.model';
 import { Tag } from '../../../interfaces/tag.model';
+import { StickerFilter } from '../../../interfaces/sticker-filter.model';
 import { ModalMessageComponent } from '../../../components/modal/modal-message.component';
 import { GridPagerComponent } from '../../../components/grid-pager/grid-pager.component';
+import { StickerFilterComponent } from '../../../components/sticker-filter/sticker-filter.component';
 import { ErrorMessage } from '../../../interfaces/error.model';
 import { ShowToastService } from '../../../shared/services/show-toast.service';
 
@@ -41,6 +43,7 @@ import { ShowToastService } from '../../../shared/services/show-toast.service';
     BadgeComponent,
     IconDirective,
     ModalMessageComponent,
+    StickerFilterComponent,
     GridPagerComponent,
     NgIf,
     Select2Module
@@ -52,8 +55,7 @@ export class SearchComponent implements OnInit {
   stickers: Sticker[] = [];
   tags: Select2Option[] = [];
   stickerToHandle!: Sticker;
-  stickerForm!: FormGroup;
-  submitted = false;
+  stickerSearch!: Sticker;
   actionIcons = { cilPencil, cilTrash, cilFeaturedPlaylist };
   @ViewChild(ModalMessageComponent) modalComponent!: ModalMessageComponent;
   @ViewChild(GridPagerComponent) pagerComponent!: GridPagerComponent;
@@ -73,14 +75,12 @@ export class SearchComponent implements OnInit {
     private tagRepository: TagRepositoryService,
     private photoRepository: PhotoRepositoryService,
     private defaults: DefaultValuesService,
-    private formBuilder: FormBuilder,
     private router: Router,
     private toast: ShowToastService
   ) { }
 
   ngOnInit(): void {
     this.stickerToHandle = this.defaults.StickerObject();
-    this.stickerForm = this.formBuilder.group({ name: [""], tag: [""] });
     this.getTags();
     this.getStickers();
     this.currentPage = 1;
@@ -88,32 +88,13 @@ export class SearchComponent implements OnInit {
     this.itemsPerPage = this.defaults.GetItemsPerPage(EndPoints.Sticker);
   }
 
-  get form() { return this.stickerForm.controls; }
-
-  onSubmit() {
-    this.submitted = true;
+  getFilters(event: StickerFilter) {
     this.showDetails = false;
     this.stickerToHandle.IdSticker = 0;
-    const selectedTags = this.form['tag'].value;
-    let tagObject: Tag[] = [this.defaults.TagObject()];
-    if (selectedTags) {
-      tagObject = selectedTags.map((tag: string) => {
-        return {
-          IdTag: tag,
-          TagName: ''
-        }
-      });
+    if (event) {
+      this.stickerSearch = event.Sticker
+      this.getStickers(this.stickerSearch);
     }
-    const stickerSearch: Sticker = {
-      IdSticker: 0,
-      StickerName: this.form['name'].value || '',
-      Tag: tagObject,
-    }
-    this.getStickers(stickerSearch);
-  }
-  onReset() {
-    this.submitted = false;
-    this.stickerForm.reset();
   }
   openDetail(sticker: Sticker) {
     this.showDetails = true;

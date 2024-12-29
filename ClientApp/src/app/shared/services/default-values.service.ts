@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Tag } from '../../interfaces/tag.model'
 import { Sticker } from '../../interfaces/sticker.model';
+import { StickerFilter } from '../../interfaces/sticker-filter.model';
 import { ErrorMessage } from '../../interfaces/error.model';
 import { EndPoints } from '../enums.model';
 
@@ -19,6 +20,15 @@ export class DefaultValuesService {
       IdSticker: 0,
       StickerName: '',
       Tag: [this.TagObject()]
+    }
+  }
+  public FilterObject = (): StickerFilter => {
+    return {
+      Start: 1,
+      Size: 10,
+      OrderByName: true,
+      Ascending: true,
+      Sticker: this.StickerObject()
     }
   }
   public ItemsPerTable = [5, 10, 20, 50, 100];

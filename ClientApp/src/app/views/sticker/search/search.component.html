@@ -1,40 +1,4 @@
-<c-card>
-    <c-card-header>
-      <c-row class="justify-content-between align-items-center">
-        <c-col xs="8" md="1"><span>Filtros</span></c-col>
-        <c-col xs="4" md="1"><button cButton type="reset" color="secondary" variant="outline" (click)="onReset()">Limpiar</button></c-col>
-      </c-row>
-    </c-card-header>
-    <c-card-body>
-      <form cForm (ngSubmit)="onSubmit()" [formGroup]="stickerForm">
-        <c-row gutter="3" class="align-items-center">
-          <c-col xs="12" md="6">
-            <c-input-group class="flex-nowrap">
-              <span cInputGroupText>Nombre</span>
-              <input cFormControl type="text" formControlName="name" />
-            </c-input-group>
-          </c-col>
-          <c-col xs="12" md="5">
-            <c-input-group class="flex-nowrap">
-              <span cInputGroupText>Etiquetas</span>
-              <select2 formControlName="tag" multiple="true" class="wideSelect"
-                [data]="tags"
-                noResultMessage="Enter para crear una nueva etiqueta" 
-                (autoCreateItem)="handleCreateTag($event)" 
-                resetSelectedValue=""
-                autoCreate 
-                resettable>
-              </select2>
-            </c-input-group>
-          </c-col>
-          <c-col xs="12" md="1">
-            <button cButton type="submit" class="float-end">Buscar</button>
-          </c-col>
-        </c-row>
-      </form>
-    </c-card-body>
-  </c-card>
-  <br />
+  <app-sticker-filter (filters)="getFilters($event)"></app-sticker-filter>  
   <c-card>
     <c-card-header>
       Resultados
