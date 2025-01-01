@@ -22,3 +22,12 @@ public class Sticker
     [JsonIgnore]
     public DateTime Created { get; }
 }
+
+public record StickerFilter
+{
+    public bool Ascending { get; set; }
+
+    public bool OrderByName { get; set; }
+
+    public Sticker Sticker { get; set; }
+}

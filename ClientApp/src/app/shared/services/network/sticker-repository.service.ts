@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Sticker } from '../../../interfaces/sticker.model'; 
 import { EndPoints, ApiAddresses } from '../../enums.model';
 import { RequestHelperService } from './request-helper.service';
+import { StickerFilter } from '../../../interfaces/sticker-filter.model';
 
 @Injectable({
   providedIn: 'root'
@@ -14,10 +15,10 @@ export class StickerRepositoryService {
     private request: RequestHelperService
   ) { }
 
-  public getStickers = (sticker: Sticker) => {
+  public getStickers = (filters: StickerFilter) => {
     return this.http.post<Sticker[]>(
       this.request.createCompleteRoute(ApiAddresses.Sticker, EndPoints.Get),
-      sticker,
+      filters,
       this.request.generateHeaders()
     );
   }

@@ -13,10 +13,11 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
 {
     private readonly IDbConnection db = new MySqlConnection(connectionStrings.Value.StickerConnectionString);
 
-    public async Task<IResult> SearchSticker(Sticker sticker)
+    public async Task<IResult> SearchSticker(StickerFilter filters)
     {
         try
         {
+            var builder = new SqlBuilder();
             var sql = @"SELECT
                     S.IdSticker,
                     S.StickerName,
@@ -25,28 +26,34 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
                 FROM stickers S 
                     LEFT JOIN stickertags ST ON ST.IdSticker = S.IdSticker
                     LEFT JOIN tags T ON T.IdTag = ST.IdTag
-                WHERE (@NoTags = 1 OR T.IdTag IN @TagIdList) AND
-                    (@StickerName = '' OR S.StickerName LIKE CONCAT('%', @StickerName, '%'))
-                ORDER BY S.StickerName";
+                /**where**/ 
+                /**orderby**/";
 
-            var tagList = sticker.Tag.Select(t => t.IdTag).ToArray();
-            sticker.TagIdList = tagList;
-            sticker.NoTags = tagList[0] != 0 ? 0 : 1;
-            var stickers = await db.QueryAsync<Sticker, Tag, Sticker>(sql,
+            var template = builder.AddTemplate(sql);
+            if (filters.Sticker.StickerName.Length > 0) 
+            {
+                var name = filters.Sticker.StickerName;
+                builder.Where($"S.StickerName LIKE CONCAT('%', '{name}', '%')", new { name });
+            }
+            var tagList = filters.Sticker.Tag.Select(t => t.IdTag).ToArray();
+            if (tagList?.First() != 0)
+            {
+                var strTagList = string.Join(",", tagList);
+                builder.Where($"T.IdTag IN ({strTagList})", new { strTagList });
+
+            }
+            var orderCriterium = filters.Ascending ? "ASC" : "DESC";
+            var nameCriterium = filters.OrderByName ? "S.StickerName" : "S.IdSticker";
+            var orderByCriterium = $"{nameCriterium} {orderCriterium}";
+            builder.OrderBy($"{orderByCriterium}");
+
+            var stickers = await db.QueryAsync<Sticker, Tag, Sticker>(template.RawSql,
                 (sticker, tag) => 
                 {
                     sticker.Tag = new List<Tag>{ tag };
                     sticker.TagIdList = tagList;
                     return sticker;
-                }, splitOn: "IdTag",
-                param: new
-                {
-                    sticker.Tag,
-                    sticker.TagIdList,
-                    sticker.StickerName,
-                    sticker.NoTags
-                }
-            ).ConfigureAwait(false);
+                }, splitOn: "IdTag").ConfigureAwait(false);
 
             var response = stickers
                 .GroupBy(p => p.IdSticker)

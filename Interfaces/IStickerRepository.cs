@@ -4,7 +4,7 @@ namespace sticker.Interfaces;
 
 interface IStickerRepository
 {
-    Task<IResult> SearchSticker(Sticker sticker);
+    Task<IResult> SearchSticker(StickerFilter filters);
 
     Task<IResult> SaveSticker(Sticker sticker);
 

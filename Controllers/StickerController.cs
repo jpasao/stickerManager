@@ -18,9 +18,9 @@ public class StickerController : ControllerBase
     }
 
     [HttpPost("Get")]
-    public async Task<IResult> Get(Sticker sticker)
+    public async Task<IResult> Get(StickerFilter filters)
     {
-        return await repository.SearchSticker(sticker);
+        return await repository.SearchSticker(filters);
     }
 
     [HttpPost("Post")]

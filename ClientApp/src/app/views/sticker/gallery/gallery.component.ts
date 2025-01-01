@@ -152,8 +152,8 @@ export class GalleryComponent implements OnInit{
       });
   }
   private getSticker = (): Observable<Sticker> => {
-    const sticker: Sticker = this.defaults.StickerObject();
-    sticker.StickerName = this.imageToHandle.StickerName!;
+    const sticker: StickerFilter = this.defaults.FilterObject();
+    sticker.Sticker.StickerName = this.imageToHandle.StickerName!;
     let stickerToReturn = new Subject<Sticker>
     this.stickerRepository
       .getStickers(sticker)

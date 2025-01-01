@@ -92,8 +92,7 @@ export class SearchComponent implements OnInit {
     this.showDetails = false;
     this.stickerToHandle.IdSticker = 0;
     if (event) {
-      this.stickerSearch = event.Sticker
-      this.getStickers(this.stickerSearch);
+      this.getStickers(event);
     }
   }
   openDetail(sticker: Sticker) {
@@ -148,7 +147,7 @@ export class SearchComponent implements OnInit {
         }
       });
   }
-  private getStickers = (sticker: Sticker = this.defaults.StickerObject()) => {
+  private getStickers = (sticker: StickerFilter = this.defaults.FilterObject()) => {
     this.stickerRepository
       .getStickers(sticker)
       .subscribe({
