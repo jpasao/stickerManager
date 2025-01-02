@@ -20,17 +20,17 @@ export const routes: Routes = [
         }
       },
       {
-        path: 'save',
-        loadComponent: () => import('./edit/edit.component').then(m => m.EditComponent),
-        data: {
-          title: 'Guardar'
-        }
-      },
-      {
         path: 'gallery',
         loadComponent: () => import('./gallery/gallery.component').then(m => m.GalleryComponent),
         data: {
           title: 'Galería'
+        }
+      },
+      {
+        path: 'save',
+        loadComponent: () => import('./edit/edit.component').then(m => m.EditComponent),
+        data: {
+          title: 'Guardar'
         }
       },
     ]

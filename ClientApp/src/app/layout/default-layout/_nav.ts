@@ -16,15 +16,16 @@ export const navItems: INavData[] = [
     iconComponent: { name: 'cil-note-add' }
   },
   {
-    name: 'Añadir',
-    url: '/stickers/save',
-    iconComponent: { name: 'cil-pencil' }
-  },
-  {
     name: 'Galería',
     url: '/stickers/gallery',
     iconComponent: { name: 'cil-applications' }
   },
+  {
+    name: 'Añadir',
+    url: '/stickers/save',
+    iconComponent: { name: 'cil-pencil' }
+  },
+
   {
     name: 'Etiquetas',
     title: true

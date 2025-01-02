@@ -32,4 +32,5 @@ export enum Entities {
     sticker = 'pegatina',
     tag = 'etiqueta',
     photo = 'imagen',
+    chart = 'gráfica'
 }

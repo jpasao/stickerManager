@@ -15,19 +15,19 @@ export class DashboardRepositoryService {
   ) { }
 
   public getOverview = () => {
-    return this.http.get<Dashboard>(
+    return this.http.get<Dashboard[]>(
       this.request.createCompleteRoute(ApiAddresses.Dashboard, EndPoints.Overview)
     );
   }
 
   public getSticker = () => {
-    return this.http.get<Dashboard>(
+    return this.http.get<Dashboard[]>(
       this.request.createCompleteRoute(ApiAddresses.Dashboard, EndPoints.Sticker)
     );
   }
 
   public getTag = () => {
-    return this.http.get<Dashboard>(
+    return this.http.get<Dashboard[]>(
       this.request.createCompleteRoute(ApiAddresses.Dashboard, EndPoints.Tag)
     );
   }
