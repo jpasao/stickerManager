@@ -17,11 +17,19 @@ public class TagRepository(IOptions<ConnectionString> connectionStrings) : ITagR
     {
         try
         {
+            var builder = new SqlBuilder();
             var sql = @"SELECT IdTag, TagName
                 FROM tags
-                WHERE (@TagName = '' OR TagName LIKE CONCAT('%', @TagName, '%'))
+                /**where**/
                 ORDER BY TagName";
-            var response = (await db.QueryAsync<Tag>(sql, tag).ConfigureAwait(false)).AsList();
+
+            var template = builder.AddTemplate(sql);
+            if (tag.TagName.Length > 0)
+            {
+                var name = tag.TagName;
+                builder.Where($"TagName LIKE CONCAT('%', '{name}', '%')", new { name });
+            }
+            var response = (await db.QueryAsync<Tag>(template.RawSql, tag).ConfigureAwait(false)).AsList();
 
             return Response.BuildResponse(response);
         }

@@ -30,7 +30,7 @@ CREATE TABLE `images` (
   PRIMARY KEY (`IdImage`),
   KEY `images_stickers_FK` (`IdSticker`),
   CONSTRAINT `images_stickers_FK` FOREIGN KEY (`IdSticker`) REFERENCES `stickers` (`IdSticker`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,8 +45,9 @@ CREATE TABLE `stickers` (
   `StickerName` varchar(200) NOT NULL,
   `Created` date DEFAULT current_timestamp(),
   PRIMARY KEY (`IdSticker`),
-  UNIQUE KEY `stickers_unique` (`StickerName`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `stickers_unique` (`StickerName`),
+  KEY `stickers_StickerName_index` (`StickerName`)
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -59,8 +60,9 @@ DROP TABLE IF EXISTS `stickertags`;
 CREATE TABLE `stickertags` (
   `IdSticker` int(11) NOT NULL,
   `IdTag` int(11) NOT NULL,
-  PRIMARY KEY (`IdSticker`,`IdTag`),
+  PRIMARY KEY (`IdTag`,`IdSticker`),
   KEY `stickertags_tags_FK` (`IdTag`),
+  KEY `stickertags_stickers_FK` (`IdSticker`),
   CONSTRAINT `stickertags_stickers_FK` FOREIGN KEY (`IdSticker`) REFERENCES `stickers` (`IdSticker`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `stickertags_tags_FK` FOREIGN KEY (`IdTag`) REFERENCES `tags` (`IdTag`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -78,16 +80,8 @@ CREATE TABLE `tags` (
   `TagName` varchar(200) NOT NULL,
   PRIMARY KEY (`IdTag`),
   UNIQUE KEY `tags_unique` (`TagName`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping events for database 'dbstickers'
---
-
---
--- Dumping routines for database 'dbstickers'
---
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -98,4 +92,4 @@ CREATE TABLE `tags` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-19  9:29:09
+-- Dump completed on 2025-01-03 12:24:10
