@@ -26,10 +26,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(policyName, builder =>
     {
-            builder.AllowAnyMethod()
-                .AllowAnyHeader()
-                .SetIsOriginAllowed(origin => true)
-                .AllowCredentials();
+        builder.AllowAnyMethod()
+            .AllowAnyHeader()
+            .SetIsOriginAllowed(origin => true)
+            .AllowCredentials();
     });
 });
 
@@ -47,14 +47,15 @@ if (app.Environment.IsDevelopment())
         return next(context);
     });
 }
-
+app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseCors(policyName);
-app.Urls.Add("http://192.168.0.22:5001");
+app.Urls.Add("http://*:5001");
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
 
+app.MapFallbackToFile("index.html");
 app.Run();
