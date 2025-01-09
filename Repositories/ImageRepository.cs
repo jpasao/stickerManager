@@ -34,7 +34,6 @@ public class ImageRepository(IOptions<ConnectionString> connectionStrings) : IIm
     {
         try
         {
-            var start = filters.Start - 1;
             var tagList = filters.Sticker?.Tag?.Select(t => t.IdTag).ToArray();
             var strTagList = string.Join(",", tagList);
             var orderCriterium = filters.Ascending ? "ASC" : "DESC";
@@ -64,7 +63,7 @@ public class ImageRepository(IOptions<ConnectionString> connectionStrings) : IIm
             builder.AddParameters(parameters: new 
             {
                 Limit = filters.Size,
-                Offset = start
+                Offset = filters.Start
             });
 
             var response = await db.QueryAsync<Image>(template.RawSql, template.Parameters);

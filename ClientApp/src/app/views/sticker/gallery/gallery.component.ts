@@ -110,7 +110,8 @@ export class GalleryComponent implements OnInit{
     }
   }
   private getThumbnails = (filters: StickerFilter = this.defaults.FilterObject()) => {
-    const pagedSearch: StickerFilter = { ...filters, Start: this.currentPage, Size: this.itemsPerPage};
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const pagedSearch: StickerFilter = { ...filters, Start: start, Size: this.itemsPerPage};
     this.photoRepository
       .getThumbnails(pagedSearch)
       .subscribe({
