@@ -45,15 +45,19 @@
                       <img cImg fluid [src]="stickerImage.Src" thumbnail />
                       <div class="d-grid gap-2 d-md-flex justify-content-md-between my-3">
                         <button cButton color="danger" class="me-md-2" (click)="openDeleteModal()">Borrar</button>
-                        <a cButton color="primary" class="me-md-2" [href]="stickerImage.Src" [download]="receivedSticker.StickerName">Descargar</a>
+                        <a cButton color="primary" class="me-md-2" 
+                          [href]="stickerImage.Src" 
+                          [download]="receivedSticker.StickerName" 
+                          [disabled]="!isEditing"
+                        >Descargar</a>
                       </div>
                     }
                     @else {
                       <div class="mb-3">
                         <label cLabel for="formFile">
-                          {{isEditing ? 'Esta pegatina aún no tiene imagen' : 'Guarda primero los datos para añadir la imagen'}}
+                          {{isEditing ? 'Esta pegatina aún no tiene imagen' : 'Añade una imagen'}}
                         </label>
-                        <input cFormControl id="formFile" type="file" [disabled]="!isEditing" (change)="handleAddImage($event)" />
+                        <input cFormControl id="formFile" type="file" (change)="showImage($event)" />
                       </div>
                     }
                   </c-col>

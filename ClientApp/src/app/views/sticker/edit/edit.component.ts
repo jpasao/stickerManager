@@ -171,9 +171,13 @@ export class EditComponent implements OnInit {
   }
 
   openDeleteModal() {
-    this.modalTitle = 'Borrando imagen';
-    this.modalMessage = `Vas a borrar la imagen de '${this.receivedSticker.StickerName}'. ¿Estás segura?`;
-    this.modalComponent.toggleModal();
+    if (this.isEditing) {
+      this.modalTitle = 'Borrando imagen';
+      this.modalMessage = `Vas a borrar la imagen de '${this.receivedSticker.StickerName}'. ¿Estás segura?`;
+      this.modalComponent.toggleModal();
+    } else {
+      this.stickerImage.Src = '';
+    }
   }
   handleDeleteModalResponse(event: boolean) {
     if (event) {
@@ -267,11 +271,16 @@ export class EditComponent implements OnInit {
         this.receivedSticker.IdSticker = result;
         this.receivedSticker.StickerName = this.form['name'].value;
         this.receivedSticker.Tag = this.form['tag'].value;
+        this.stickerImage = {
+          ...this.stickerImage,
+          IdSticker: result
+        };
       }
+      this.saveImage();
     }
   }
 
-  async handleAddImage(event: Event) {
+  async showImage(event: Event) {
     const element = event.currentTarget as HTMLInputElement;
     let fileList: FileList | null = element.files;
     if (fileList) {
@@ -292,39 +301,39 @@ export class EditComponent implements OnInit {
       const formData = new FormData();
       formData.append('images', fileList[0]);
       formData.append('images', thumbnail);
-      const imageToSave: Photo = {
-        IdSticker: this.receivedSticker.IdSticker,
-        IdImage: 0,
-        StickerImage: formData,
-        Src: '',
-        StickerThumbnail: ''
+      this.stickerImage = {
+        ...this.stickerImage,
+        StickerImage: formData
       };
-      this.photoRepository
-        .savePhoto(imageToSave)
-        .subscribe({
-          next: (response) => {
-            let message: string = `La imagen se ha guardado correctamente`;
-            const toastTitle = 'Guardando imagen';
-            if (response < ResponseTypes.SOME_CHANGES) {
-              message = `Ha habido un problema al guardar la imagen para '${this.form['name'].value}'`;
-              this.toast.show(toastTitle, message, ColorClasses.warning);
-            } else {
-              this.stickerImage = {
-                IdSticker: this.receivedSticker.IdSticker,
-                IdImage: response,
-                StickerImage: new FormData,
-                Src: this.stickerImage.Src,
-                StickerThumbnail: ''
-              };
-              this.toast.show(toastTitle, message, ColorClasses.info);
-            }
-          },
-          error: (err) => {
-            const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.save, Entities.photo);
-            this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
-          }
-        });
     }
+  }
+
+  async saveImage() {
+    this.photoRepository
+      .savePhoto(this.stickerImage)
+      .subscribe({
+        next: (response) => {
+          let message: string = `La imagen se ha guardado correctamente`;
+          const toastTitle = 'Guardando imagen';
+          if (response < ResponseTypes.SOME_CHANGES) {
+            message = `Ha habido un problema al guardar la imagen para '${this.form['name'].value}'`;
+            this.toast.show(toastTitle, message, ColorClasses.warning);
+          } else {
+            this.stickerImage = {
+              IdSticker: this.receivedSticker.IdSticker,
+              IdImage: response,
+              StickerImage: new FormData,
+              Src: this.stickerImage.Src,
+              StickerThumbnail: ''
+            };
+            this.toast.show(toastTitle, message, ColorClasses.info);
+          }
+        },
+        error: (err) => {
+          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.save, Entities.photo);
+          this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
+        }
+      });
   }
 
   getWidth() {
