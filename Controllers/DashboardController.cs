@@ -34,4 +34,10 @@ public class DashboardController : ControllerBase
     {
         return await repository.GetTagDistribution();
     }
+
+    [HttpGet("Category")]
+    public async Task<IResult> Category()
+    {
+        return await repository.GetCategoryDistribution();
+    }
 }

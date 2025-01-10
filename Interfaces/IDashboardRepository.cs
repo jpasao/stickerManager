@@ -7,4 +7,6 @@ interface IDashboardRepository
     Task<IResult> GetStickerDistribution();
 
     Task<IResult> GetTagDistribution();
+
+    Task<IResult> GetCategoryDistribution();
 }

@@ -13,6 +13,8 @@ public class Sticker
 
     public List<Tag>? Tag { get; set; }
 
+    public List<Category>? Category { get; set; }
+
     [JsonIgnore]
     public int[]? TagIdList { get; set; }
 

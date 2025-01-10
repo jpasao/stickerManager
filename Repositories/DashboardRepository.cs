@@ -19,6 +19,8 @@ public class DashboardRepository(IOptions<ConnectionString> connectionStrings) :
         {
             var sql = @"SELECT COUNT(*) AS Quantity, 'Etiquetas' AS Category FROM tags
                 UNION
+                SELECT COUNT(*) AS Quantity, 'Categorías' AS Category FROM categories
+                UNION
                 SELECT COUNT(*) AS Quantity, 'Pegatinas' AS Category FROM stickers
                 ORDER BY Category";
             var response = await db.QueryAsync<Dashboard>(sql).ConfigureAwait(false);
@@ -57,6 +59,25 @@ public class DashboardRepository(IOptions<ConnectionString> connectionStrings) :
                 FROM tags T
 	                INNER JOIN stickertags S ON S.IdTag = T.IdTag
                 GROUP BY S.IdTag
+                ORDER BY Category";
+            var response = await db.QueryAsync<Dashboard>(sql).ConfigureAwait(false);
+
+            return Response.BuildResponse(response);
+        }
+        catch (Exception ex)
+        {
+            return Response.BuildError(ex);
+        }
+    }
+
+    public async Task<IResult> GetCategoryDistribution()
+    {
+        try
+        {
+            var sql = @"SELECT COUNT(*) as Quantity, C.CategoryName AS Category
+                FROM categories C
+	                INNER JOIN stickercategories S ON S.IdCategory = C.IdCategory
+                GROUP BY S.IdCategory
                 ORDER BY Category";
             var response = await db.QueryAsync<Dashboard>(sql).ConfigureAwait(false);
 

@@ -61,7 +61,7 @@ public class TagRepository(IOptions<ConnectionString> connectionStrings) : ITagR
         catch (MySqlException ex)
         {
             if (ex.Message.Contains("Duplicate")) {
-                var exception = new UniqueException("Pegatinas");
+                var exception = new UniqueException("Etiquetas");
                 return Response.BuildError(exception, 400);
             }
             return Response.BuildError(ex, 400);
@@ -72,7 +72,6 @@ public class TagRepository(IOptions<ConnectionString> connectionStrings) : ITagR
         }
         catch (Exception ex)
         {
-            if (ex.Message.Contains("Duplicate")) throw new UniqueException("Etiquetas");
             return Response.BuildError(ex);
         }
     }

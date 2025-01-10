@@ -15,6 +15,8 @@ builder.Services
     });
 builder.Services.AddSingleton<TagRepository>();
 builder.Services.AddTransient<ITagRepository, TagRepository>();
+builder.Services.AddSingleton<CategoryRepository>();
+builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
 builder.Services.AddSingleton<StickerRepository>();
 builder.Services.AddTransient<IStickerRepository, StickerRepository>();
 builder.Services.AddSingleton<ImageRepository>();
@@ -39,6 +41,7 @@ if (app.Environment.IsProduction())
     app.UseHsts();
     app.UseDeveloperExceptionPage();
     app.UseCors(policyName);
+    app.Urls.Add("http://*:5001");
 } 
 if (app.Environment.IsDevelopment())
 {
@@ -46,12 +49,12 @@ if (app.Environment.IsDevelopment())
     {
         return next(context);
     });
+    app.Urls.Add("http://*:5003");
 }
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseCors(policyName);
-app.Urls.Add("http://*:5001");
 
 app.MapControllerRoute(
     name: "default",

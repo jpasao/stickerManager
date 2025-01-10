@@ -22,9 +22,13 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
                     S.IdSticker,
                     S.StickerName,
                     T.IdTag,
-                    T.TagName
+                    T.TagName,
+                    C.IdCategory,
+                    C.CategoryName
                 FROM stickers S 
                     LEFT JOIN stickertags ST ON ST.IdSticker = S.IdSticker
+                    LEFT JOIN stickercategories SC ON SC.IdSticker = S.IdSticker
+                    LEFT JOIN categories C ON C.IdCategory = SC.IdCategory
                     LEFT JOIN tags T ON T.IdTag = ST.IdTag
                 /**where**/ 
                 /**orderby**/";
@@ -42,31 +46,48 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
                 builder.Where($"T.IdTag IN ({strTagList})", new { strTagList });
 
             }
+            var categoryList = filters.Sticker.Category.Select(c => c.IdCategory).ToArray();
+            if (categoryList?.First() != 0) 
+            {
+                var strCategoryList = string.Join(",", categoryList);
+                builder.Where($"C.IdCategory IN ({strCategoryList})", new {strCategoryList});
+            }
             var orderCriterium = filters.Ascending ? "ASC" : "DESC";
             var nameCriterium = filters.OrderByName ? "S.StickerName" : "S.IdSticker";
             var orderByCriterium = $"{nameCriterium} {orderCriterium}";
             builder.OrderBy($"{orderByCriterium}");
 
-            var stickers = await db.QueryAsync<Sticker, Tag, Sticker>(template.RawSql,
-                (sticker, tag) => 
+            var stickers = await db.QueryAsync<Sticker, Tag, Category, Sticker>(template.RawSql,
+                (sticker, tag, category) => 
                 {
                     sticker.Tag = new List<Tag>{ tag };
                     sticker.TagIdList = tagList;
+                    sticker.Category = new List<Category>{ category };
                     return sticker;
-                }, splitOn: "IdTag").ConfigureAwait(false);
+                }, splitOn: "IdTag, IdCategory").ConfigureAwait(false);
 
             var response = stickers
                 .GroupBy(p => p.IdSticker)
                 .Select(g => 
                 {
                     var groupedSticker = g.First();
-                    groupedSticker.Tag = g.Select(tag => tag.Tag.Single()).ToList();
 
-                    if (groupedSticker.Tag[0] != null) {
-                    groupedSticker.Tag = groupedSticker.Tag
-                        .GroupBy(tag => tag.IdTag)
-                        .Select(tag => tag.First())
-                        .ToList();
+                    groupedSticker.Tag = g.Select(tag => tag.Tag.Single()).ToList();
+                    if (groupedSticker.Tag[0] != null) 
+                    {
+                        groupedSticker.Tag = groupedSticker.Tag
+                            .GroupBy(tag => tag.IdTag)
+                            .Select(tag => tag.First())
+                            .ToList();
+                    }
+
+                    groupedSticker.Category = g.Select(cat => cat.Category.Single()).ToList();
+                    if (groupedSticker.Category[0] != null)
+                    {
+                        groupedSticker.Category = groupedSticker.Category
+                            .GroupBy(cat => cat.IdCategory)
+                            .Select(cat => cat.First())
+                            .ToList();
                     }
 
                     return groupedSticker;
@@ -85,7 +106,7 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
         try
         {
             bool isNewSticker = sticker.IdSticker == 0;
-            int stickerSave = 0, stickerTagDelete = 0, stickerTagInsert = 0, stickerId = 0;
+            int stickerSave = 0, stickerTagDelete = 0, stickerTagInsert = 0, stickerCategoryDelete = 0, stickerCategoryInsert = 0,stickerId = 0;
 
             string sql;
             if (isNewSticker)
@@ -126,8 +147,25 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
                 });
                 stickerTagInsert = await connection.ExecuteAsync(sql, stickerTags);
             }
+            if (sticker.Category != null && sticker.Category.Count > 0 && sticker.Category[0].IdCategory != 0)
+            {
+                if (!isNewSticker)
+                {
+                    sql = "DELETE FROM stickercategories WHERE IdSticker = @IdSticker";
+                    stickerCategoryDelete = await db.ExecuteAsync(sql, sticker).ConfigureAwait(false);
+                }
 
-            var response = isNewSticker ? stickerId : stickerSave + stickerTagDelete + stickerTagInsert;
+                using var connection = new MySqlConnection(connectionStrings.Value.StickerConnectionString);
+
+                sql = "INSERT INTO stickercategories (IdCategory, IdSticker) VALUES (@IdCategory, @IdSticker)";
+                var stickerCategories = sticker.Category.Select(obj => new {
+                    obj.IdCategory,
+                    IdSticker = stickerId
+                });
+                stickerCategoryInsert = await connection.ExecuteAsync(sql, stickerCategories);
+            }
+
+            var response = isNewSticker ? stickerId : stickerSave + stickerTagDelete + stickerTagInsert + stickerCategoryDelete + stickerCategoryInsert;
 
             return Response.BuildResponse(response); 
         }
