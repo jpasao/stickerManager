@@ -18,10 +18,12 @@ public class CategoryRepository(IOptions<ConnectionString> connectionStrings) : 
         try
         {
             var builder = new SqlBuilder();
-            var sql = @"SELECT IdCategory, CategoryName
-                FROM categories
+            var sql = @"SELECT C.IdCategory, C.CategoryName, T.IdTag, T.TagName
+                FROM categories C
+                    INNER JOIN tagcategories TC ON C.IdCategory = TC.IdCategory
+                    INNER JOIN tags T ON T.IdTag = TC.IdTag
                 /**where**/
-                ORDER BY CategoryName";
+                ORDER BY C.CategoryName";
 
             var template = builder.AddTemplate(sql);
             if (category.CategoryName.Length > 0)
@@ -29,7 +31,35 @@ public class CategoryRepository(IOptions<ConnectionString> connectionStrings) : 
                 var name = category.CategoryName;
                 builder.Where($"CategoryName LIKE CONCAT('%', '{name}', '%')", new { name });
             }
-            var response = (await db.QueryAsync<Category>(template.RawSql, category).ConfigureAwait(false)).AsList();
+            var tagList = category.Tag.Select(t => t.IdTag).ToArray();
+            if (tagList?.First() != 0)
+            {
+                var strTagList = string.Join(",", tagList);
+                builder.Where($"T.IdTag IN ({strTagList})", new { strTagList });
+
+            }
+            var categories = (await db.QueryAsync<Category, Tag, Category>(template.RawSql,
+                static (category, tag) =>
+                {
+                    category.Tag = [tag];
+                    return category;
+                }, splitOn: "IdTag"));
+
+            var response = categories
+                .GroupBy(p => p.IdCategory)
+                .Select(g => 
+                {
+                    var groupedCategory = g.First();
+                    groupedCategory.Tag = g.Select(tag => tag.Tag.Single()).ToList();
+                    if (groupedCategory.Tag[0] != null)
+                    {
+                        groupedCategory.Tag = groupedCategory.Tag
+                            .GroupBy(tag => tag.IdTag)
+                            .Select(tag => tag.First())
+                            .ToList();
+                    }
+                    return groupedCategory;
+                }).AsList();
 
             return Response.BuildResponse(response);
         }
@@ -43,9 +73,10 @@ public class CategoryRepository(IOptions<ConnectionString> connectionStrings) : 
     {
         try
         {
-            int categorySave = 0;
+            int categorySave = 0, tagCategoryDelete = 0, tagCategoryInsert = 0, categoryId = 0;
             string sql;
-            if (category.IdCategory == 0)
+            bool newCategory = category.IdCategory == 0;
+            if (newCategory)
             {
                 sql = "INSERT INTO categories (CategoryName) VALUES (@CategoryName); SELECT LAST_INSERT_ID()";
                 categorySave = await db.ExecuteScalarAsync<int>(sql, category).ConfigureAwait(false);
@@ -56,7 +87,30 @@ public class CategoryRepository(IOptions<ConnectionString> connectionStrings) : 
                 categorySave = await db.ExecuteAsync(sql, category).ConfigureAwait(false);
             }
 
-            return Response.BuildResponse(categorySave);
+            categoryId = newCategory ? categorySave : category.IdCategory;
+
+            if (category.Tag != null && category.Tag.Count > 0 && category.Tag[0].IdTag != 0)
+            {
+                if (!newCategory)
+                {
+                    sql = "DELETE FROM tagcategories WHERE IdCategory = @IdCategory";
+                    tagCategoryDelete = await db.ExecuteAsync(sql, category).ConfigureAwait(false);
+                }
+
+                using var connection = new MySqlConnection(connectionStrings.Value.StickerConnectionString);
+
+                sql = "INSERT INTO tagcategories (IdCategory, IdTag) VALUES (@IdCategory, @IdTag)";
+                var tagCategories = category.Tag.Select(obj => new
+                {
+                    IdCategory = categoryId,
+                    obj.IdTag
+                });
+                tagCategoryInsert = await connection.ExecuteAsync(sql, tagCategories);
+            }
+
+            var response = newCategory ? categoryId : categorySave + tagCategoryDelete + tagCategoryInsert;
+
+            return Response.BuildResponse(response);
         }
         catch (MySqlException ex)
         {
@@ -96,10 +150,10 @@ public class CategoryRepository(IOptions<ConnectionString> connectionStrings) : 
         try
         {
             var sql = @"
-                SELECT S.StickerName AS Name, 'Pegatinas' AS Category
+               SELECT T.TagName AS Name, 'Etiquetas' AS Category
                 FROM categories C
-                    INNER JOIN stickercategories SC ON C.IdCategory = SC.IdCategory
-                    INNER JOIN stickers S ON S.IdSticker = SC.IdSticker
+                    INNER JOIN tagcategories TC ON C.IdCategory = TC.IdCategory
+                    INNER JOIN tags T ON TC.IdTag = T.IdTag
                 WHERE C.IdCategory = @IdCategory
                 ORDER BY Name";
             var response = await db.QueryAsync<Dependency>(sql, new { IdCategory = id }).ConfigureAwait(false);

@@ -29,6 +29,7 @@ public class TagRepository(IOptions<ConnectionString> connectionStrings) : ITagR
                 var name = tag.TagName;
                 builder.Where($"TagName LIKE CONCAT('%', '{name}', '%')", new { name });
             }
+            
             var response = (await db.QueryAsync<Tag>(template.RawSql, tag).ConfigureAwait(false)).AsList();
 
             return Response.BuildResponse(response);
@@ -100,6 +101,12 @@ public class TagRepository(IOptions<ConnectionString> connectionStrings) : ITagR
                 FROM tags T
                     INNER JOIN stickertags ST ON T.IdTag = ST.IdTag
                     INNER JOIN stickers S ON S.IdSticker = ST.IdSticker
+                WHERE T.IdTag = @IdTag
+                UNION 
+                SELECT C.CategoryName AS Name, 'Categorías' AS Category
+                FROM categories C
+                    INNER JOIN tagcategories TC ON TC.IdCategory = C.IdCategory
+                    INNER JOIN tags T ON TC.IdTag = T.IdTag
                 WHERE T.IdTag = @IdTag
                 ORDER BY Name";
             var response = await db.QueryAsync<Dependency>(sql, new { IdTag = id }).ConfigureAwait(false);

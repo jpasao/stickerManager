@@ -27,7 +27,7 @@ CREATE TABLE `categories` (
   `CategoryName` varchar(200) NOT NULL,
   PRIMARY KEY (`IdCategory`),
   UNIQUE KEY `categories_unique` (`CategoryName`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -49,23 +49,6 @@ CREATE TABLE `images` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `stickercategories`
---
-
-DROP TABLE IF EXISTS `stickercategories`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `stickercategories` (
-  `IdSticker` int(11) NOT NULL,
-  `IdCategory` int(11) NOT NULL,
-  PRIMARY KEY (`IdSticker`,`IdCategory`),
-  KEY `stickercategories_categories_FK` (`IdCategory`),
-  CONSTRAINT `stickercategories_categories_FK` FOREIGN KEY (`IdCategory`) REFERENCES `categories` (`IdCategory`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `stickercategories_stickers_FK` FOREIGN KEY (`IdSticker`) REFERENCES `stickers` (`IdSticker`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `stickers`
 --
 
@@ -79,7 +62,7 @@ CREATE TABLE `stickers` (
   PRIMARY KEY (`IdSticker`),
   UNIQUE KEY `stickers_unique` (`StickerName`),
   KEY `stickers_StickerName_index` (`StickerName`)
-) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -97,6 +80,23 @@ CREATE TABLE `stickertags` (
   KEY `stickertags_stickers_FK` (`IdSticker`),
   CONSTRAINT `stickertags_stickers_FK` FOREIGN KEY (`IdSticker`) REFERENCES `stickers` (`IdSticker`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `stickertags_tags_FK` FOREIGN KEY (`IdTag`) REFERENCES `tags` (`IdTag`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tagcategories`
+--
+
+DROP TABLE IF EXISTS `tagcategories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tagcategories` (
+  `IdCategory` int(11) NOT NULL,
+  `IdTag` int(11) NOT NULL,
+  PRIMARY KEY (`IdCategory`,`IdTag`),
+  KEY `tagcategories_tags_FK` (`IdTag`),
+  CONSTRAINT `tagcategories_categories_FK` FOREIGN KEY (`IdCategory`) REFERENCES `categories` (`IdCategory`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `tagcategories_tags_FK` FOREIGN KEY (`IdTag`) REFERENCES `tags` (`IdTag`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -124,4 +124,4 @@ CREATE TABLE `tags` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-01-10 13:03:19
+-- Dump completed on 2025-01-13 16:09:55

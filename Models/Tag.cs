@@ -8,5 +8,5 @@ public class Tag
     [Key]
     public int IdTag { get; set; }
 
-    public required string TagName { get; set; } 
+    public required string TagName { get; set; }
 }

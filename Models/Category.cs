@@ -8,5 +8,7 @@ public class Category
     [Key]
     public int IdCategory { get; set; }
 
-    public required string CategoryName { get; set; } 
+    public required string CategoryName { get; set; }
+
+    public List<Tag>? Tag { get; set; }
 }

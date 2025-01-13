@@ -27,9 +27,9 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
                     C.CategoryName
                 FROM stickers S 
                     LEFT JOIN stickertags ST ON ST.IdSticker = S.IdSticker
-                    LEFT JOIN stickercategories SC ON SC.IdSticker = S.IdSticker
-                    LEFT JOIN categories C ON C.IdCategory = SC.IdCategory
                     LEFT JOIN tags T ON T.IdTag = ST.IdTag
+                    LEFT JOIN tagcategories TC ON TC.IdTag = T.IdTag
+                    LEFT JOIN categories C ON C.IdCategory = TC.IdCategory
                 /**where**/ 
                 /**orderby**/";
 
@@ -57,14 +57,14 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
             var orderByCriterium = $"{nameCriterium} {orderCriterium}";
             builder.OrderBy($"{orderByCriterium}");
 
-            var stickers = await db.QueryAsync<Sticker, Tag, Category, Sticker>(template.RawSql,
+            var stickers = (await db.QueryAsync<Sticker, Tag, Category, Sticker>(template.RawSql,
                 (sticker, tag, category) => 
                 {
                     sticker.Tag = new List<Tag>{ tag };
                     sticker.TagIdList = tagList;
                     sticker.Category = new List<Category>{ category };
                     return sticker;
-                }, splitOn: "IdTag, IdCategory").ConfigureAwait(false);
+                }, splitOn: "IdTag, IdCategory"));
 
             var response = stickers
                 .GroupBy(p => p.IdSticker)
@@ -76,18 +76,26 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
                     if (groupedSticker.Tag[0] != null) 
                     {
                         groupedSticker.Tag = groupedSticker.Tag
-                            .GroupBy(tag => tag.IdTag)
+                            .GroupBy(tag => tag?.IdTag)
                             .Select(tag => tag.First())
                             .ToList();
+                    }
+                    else 
+                    {
+                        groupedSticker.Tag = null;
                     }
 
                     groupedSticker.Category = g.Select(cat => cat.Category.Single()).ToList();
                     if (groupedSticker.Category[0] != null)
                     {
                         groupedSticker.Category = groupedSticker.Category
-                            .GroupBy(cat => cat.IdCategory)
+                            .GroupBy(cat => cat?.IdCategory)
                             .Select(cat => cat.First())
                             .ToList();
+                    } 
+                    else 
+                    {
+                        groupedSticker.Category = null;
                     }
 
                     return groupedSticker;
