@@ -27,7 +27,7 @@ CREATE TABLE `categories` (
   `CategoryName` varchar(200) NOT NULL,
   PRIMARY KEY (`IdCategory`),
   UNIQUE KEY `categories_unique` (`CategoryName`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,11 +41,10 @@ CREATE TABLE `images` (
   `IdImage` int(11) NOT NULL AUTO_INCREMENT,
   `IdSticker` int(11) NOT NULL,
   `StickerImage` mediumblob NOT NULL,
-  `StickerThumbnail` blob NOT NULL DEFAULT 0,
   PRIMARY KEY (`IdImage`),
   KEY `images_stickers_FK` (`IdSticker`),
   CONSTRAINT `images_stickers_FK` FOREIGN KEY (`IdSticker`) REFERENCES `stickers` (`IdSticker`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -62,7 +61,7 @@ CREATE TABLE `stickers` (
   PRIMARY KEY (`IdSticker`),
   UNIQUE KEY `stickers_unique` (`StickerName`),
   KEY `stickers_StickerName_index` (`StickerName`)
-) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -112,7 +111,7 @@ CREATE TABLE `tags` (
   `TagName` varchar(200) NOT NULL,
   PRIMARY KEY (`IdTag`),
   UNIQUE KEY `tags_unique` (`TagName`)
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -124,4 +123,4 @@ CREATE TABLE `tags` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-01-13 16:09:55
+-- Dump completed on 2025-01-15 17:18:58

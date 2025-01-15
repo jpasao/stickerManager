@@ -4,6 +4,7 @@ import { Sticker } from '../../interfaces/sticker.model';
 import { StickerFilter } from '../../interfaces/sticker-filter.model';
 import { ErrorMessage } from '../../interfaces/error.model';
 import { EndPoints } from '../enums.model';
+import { Category } from '../../interfaces/category.model';
 
 @Injectable({
   providedIn: 'root'
@@ -15,11 +16,19 @@ export class DefaultValuesService {
       TagName: ''
     }
   }
+  public CategoryObject = (): Category => {
+    return {
+      IdCategory: 0,
+      CategoryName: '',
+      Tag: [this.TagObject()],
+    }
+  }
   public StickerObject = (): Sticker => {
     return {
       IdSticker: 0,
       StickerName: '',
-      Tag: [this.TagObject()]
+      Tag: [this.TagObject()],
+      Category: [this.CategoryObject()],
     }
   }
   public FilterObject = (): StickerFilter => {
@@ -69,35 +78,6 @@ export class DefaultValuesService {
         reject(error);
       }
     });
-  }
-  public resizeImage(imageURL: any): Promise<any> {
-    return new Promise((resolve) => {
-      const image = new Image();
-      image.onload = function () {
-        const thumbnailSize: number = 150;
-        const canvas = document.createElement('canvas');
-        canvas.width = thumbnailSize;
-        canvas.height = thumbnailSize;
-        const ctx = canvas.getContext('2d');
-        if (ctx != null) {
-          ctx.drawImage(image, 0, 0, thumbnailSize, thumbnailSize);
-        }
-        return canvas.toBlob((blob) => resolve(blob));
-      };
-      image.src = imageURL;
-    });
-  }
-  public async getThumbnail(file: any): Promise<any> {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = async () => {
-        await this.resizeImage(reader.result as string)
-          .then((result: any) => {
-            resolve(result);
-          });
-      }
-    })
   }
 
   constructor() { }

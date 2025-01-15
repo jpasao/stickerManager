@@ -138,7 +138,7 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
 
             stickerId = isNewSticker ? stickerSave : sticker.IdSticker;
 
-            if (sticker.Tag != null && sticker.Tag.Count > 0 && sticker.Tag[0].IdTag != 0)
+            if (sticker.Tag != null && sticker.Tag.Count > 0)
             {
                 if (!isNewSticker)
                 {
@@ -146,14 +146,16 @@ public class StickerRepository(IOptions<ConnectionString> connectionStrings) : I
                     stickerTagDelete = await db.ExecuteAsync(sql, sticker).ConfigureAwait(false);
                 }
 
-                using var connection = new MySqlConnection(connectionStrings.Value.StickerConnectionString);
+                if (sticker.Tag[0].IdTag != 0) {
+                    using var connection = new MySqlConnection(connectionStrings.Value.StickerConnectionString);
 
-                sql = "INSERT INTO stickertags (IdTag, IdSticker) VALUES (@IdTag, @IdSticker)";
-                var stickerTags = sticker.Tag.Select(obj => new {
-                    obj.IdTag,
-                    IdSticker = stickerId
-                });
-                stickerTagInsert = await connection.ExecuteAsync(sql, stickerTags);
+                    sql = "INSERT INTO stickertags (IdTag, IdSticker) VALUES (@IdTag, @IdSticker)";
+                    var stickerTags = sticker.Tag.Select(obj => new {
+                        obj.IdTag,
+                        IdSticker = stickerId
+                    });
+                    stickerTagInsert = await connection.ExecuteAsync(sql, stickerTags);
+                }
             }
             if (sticker.Category != null && sticker.Category.Count > 0 && sticker.Category[0].IdCategory != 0)
             {

@@ -3,6 +3,7 @@ export enum EndPoints {
     Post = 'Post',
     Sticker = 'Sticker',
     Tag = 'Tag',
+    Category = 'Category',
     Overview = 'Overview',
     Dependency = 'Dependency',
     Thumbnail = 'Thumbnails',
@@ -10,6 +11,7 @@ export enum EndPoints {
 }
 export enum ApiAddresses {
     Tag = 'Tag',
+    Category = 'Category',
     Sticker = 'Sticker',
     Image = 'Image',
     Dashboard = 'Dashboard',
@@ -31,6 +33,7 @@ export enum Operations {
 export enum Entities {
     sticker = 'pegatina',
     tag = 'etiqueta',
+    category = 'categoría',
     photo = 'imagen',
     chart = 'gráfica'
 }

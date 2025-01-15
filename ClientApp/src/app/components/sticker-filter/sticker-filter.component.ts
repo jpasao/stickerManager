@@ -1,4 +1,4 @@
-import { Component, OnInit, output, ViewChild } from '@angular/core';
+import { Component, OnInit, output } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import {
@@ -12,11 +12,13 @@ import { Select2Module, Select2UpdateEvent, Select2Option } from 'ng-select2-com
 
 import { DefaultValuesService } from '../../shared/services/default-values.service';
 import { Tag } from '../../interfaces/tag.model';
+import { CategoryRepositoryService } from '../../shared/services/network/category-repository.service';
 import { TagRepositoryService } from '../../shared/services/network/tag-repository.service';
 import { ErrorMessage } from '../../interfaces/error.model';
 import { ColorClasses, Entities, Operations, ResponseTypes } from '../../shared/enums.model';
 import { ShowToastService } from '../../shared/services/show-toast.service';
 import { StickerFilter } from '../../interfaces/sticker-filter.model';
+import { Category } from '../../interfaces/category.model';
 
 @Component({
   selector: 'app-sticker-filter',
@@ -33,12 +35,14 @@ import { StickerFilter } from '../../interfaces/sticker-filter.model';
   styleUrl: './sticker-filter.component.scss'
 })
 export class StickerFilterComponent implements OnInit {
+  categories: Select2Option[] = [];
   tags: Select2Option[] = [];
   stickerForm!: FormGroup;
   radioForm!: FormGroup;
   filters = output<StickerFilter>();
 
   constructor(
+    private categoryRepository: CategoryRepositoryService,
     private tagRepository: TagRepositoryService,
     private defaults: DefaultValuesService,
     private formBuilder: FormBuilder,
@@ -46,10 +50,11 @@ export class StickerFilterComponent implements OnInit {
   ){ }
 
   ngOnInit(): void {
-    this.stickerForm = this.formBuilder.group({name: [""], tag: [""]});
+    this.stickerForm = this.formBuilder.group({name: [""], tag: [""], category: [""]});
     this.radioForm = this.formBuilder.group({field: [""], ascend: [""]});
     this.setFieldValue("name");
     this.setAscendingValue("asc");
+    this.getCategoriesList();
     this.getTags();
   }
 
@@ -67,6 +72,16 @@ export class StickerFilterComponent implements OnInit {
     this.radioForm.patchValue({ ascend: value });
   }
   getFilters() {
+    const selectedCategories = this.form['category'].value;
+    let categoryObject: Category[] = [this.defaults.CategoryObject()];
+    if (selectedCategories && selectedCategories.length) {
+      categoryObject = selectedCategories.map((category: string) => {
+        return {
+          IdCategory: category,
+          CategoryName: ''
+        }
+      });
+    }
     const selectedTags = this.form['tag'].value;
     let tagObject: Tag[] = [this.defaults.TagObject()];
     if (selectedTags && selectedTags.length) {
@@ -85,10 +100,29 @@ export class StickerFilterComponent implements OnInit {
       Sticker: {
         IdSticker: 0,
         StickerName: this.form['name'].value || '',
-        Tag: tagObject
+        Category: categoryObject,
+        Tag: tagObject,
       }
     };
     this.filters.emit(selectedFilters);
+  }
+  private getCategoriesList = () => {
+    this.categoryRepository
+      .getCategories(this.defaults.CategoryObject())
+      .subscribe({
+        next: (response) => {
+          this.categories = response.map((category) => {
+            return {
+              value: category.IdCategory,
+              label: category.CategoryName
+            }
+          });
+        },
+        error: (err) => {
+          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.get, Entities.category);
+          this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
+        }
+      });
   }
   private getTags = () => {
     this.tagRepository
@@ -104,6 +138,39 @@ export class StickerFilterComponent implements OnInit {
         },
         error: (err) => {
           const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.get, Entities.tag);
+          this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
+        }
+      });
+  }
+  handleCreateCategory(event: Select2UpdateEvent<any>) {
+    if (event === null || event.value.value.length === 0) return;
+    const categoryName = event.value.value;
+    const categoryToSave: Category = {
+      IdCategory: 0,
+      CategoryName: categoryName,
+      Tag: []
+    };
+    this.categoryRepository
+      .createCategory(categoryToSave)
+      .subscribe({
+        next: (response) => {
+          let message: string = `La categoría '${categoryName}' se ha guardado correctamente`;
+          const toastTitle = 'Guardando categoría';
+
+          if (response < ResponseTypes.SOME_CHANGES) {
+            message = `Ha habido un problema al crear la categoría '${categoryName}'`;
+            this.toast.show(toastTitle, message, ColorClasses.warning);
+          } else {
+            this.toast.show(toastTitle, message, ColorClasses.info);
+            this.categories.forEach(category => {
+              if (category.value === categoryName) {
+                category.value = response;
+              }
+            });
+          }
+        },
+        error: (err) => {
+          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.save, Entities.category);
           this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
         }
       });

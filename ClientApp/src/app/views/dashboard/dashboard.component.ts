@@ -6,6 +6,7 @@ import {
   CardHeaderComponent,
   RowComponent,
   ColComponent,
+  FormSelectDirective
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
 
@@ -20,12 +21,15 @@ import { Operations, Entities, ColorClasses } from '../../shared/enums.model';
   templateUrl: 'dashboard.component.html',
   styleUrls: ['dashboard.component.scss'],
   standalone: true,
-  imports: [CardComponent, CardBodyComponent, RowComponent, ColComponent, ChartjsComponent, CardHeaderComponent]
+  imports: [CardComponent, CardBodyComponent, RowComponent, ColComponent, FormSelectDirective, ChartjsComponent, CardHeaderComponent]
 })
 export class DashboardComponent implements OnInit {
   overviewData!: ChartData;
   stickerData!: ChartData;
   tagData!: ChartData;
+  categoryData!: ChartData;
+  donutData!: ChartData;
+  chartType: string = 'tag';
 
   constructor(
     private dashboardRepository: DashboardRepositoryService,
@@ -37,6 +41,7 @@ export class DashboardComponent implements OnInit {
     this.getOverview();
     this.getSticker();
     this.getTag();
+    this.getCategory();
   }
   getColor = (quantity: number): string[] => {
     const colors: string[] = [];
@@ -94,12 +99,12 @@ export class DashboardComponent implements OnInit {
         }
       });
   }
-  getTag() {
+  getCategory() {
     this.dashboardRepository
-      .getTag()
+      .getCategory()
       .subscribe({
         next: (response) => {
-          this.tagData = {
+          this.categoryData = {
             labels: response.map((element) => element.Category),
             datasets: [{
               label: 'Cantidad',
@@ -113,5 +118,33 @@ export class DashboardComponent implements OnInit {
           this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
         }
       });
+  }
+  getTag() {
+    this.dashboardRepository
+      .getTag()
+      .subscribe({
+        next: (response) => {
+          this.tagData = {
+            labels: response.map((element) => element.Category),
+            datasets: [{
+              label: 'Cantidad',
+              backgroundColor: this.getColor(response.length),
+              data: response.map((element) => element.Quantity)
+            }]
+          };
+          this.donutData = this.tagData;
+        },
+        error: (err) => {
+          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.get, Entities.chart);
+          this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
+        }
+      });
+  }
+  handleChangeChartType(event: any) {
+    switch (event?.target?.value) {
+      case "tag": this.donutData = this.tagData; break;
+      case "category": this.donutData = this.categoryData; break;
+      default: return;
+    }
   }
 }

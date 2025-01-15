@@ -159,6 +159,6 @@ export class SearchComponent implements OnInit {
     this.setPager();
   }
   setPager() {
-    this.pagedItems = this.defaults.GetPagedItems(this.tags, this.currentPage, this.itemsPerPage);    
+    this.pagedItems = this.defaults.GetPagedItems(this.tags, this.currentPage, this.itemsPerPage);
   }
 }

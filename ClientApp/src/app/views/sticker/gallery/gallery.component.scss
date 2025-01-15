@@ -2,7 +2,7 @@
     display: -webkit-box;
     -webkit-line-clamp: 1;
     line-clamp: 1;
-    -webkit-box-orient: vertical;  
+    -webkit-box-orient: vertical;
     overflow: hidden;
 }
 .galleryActionButtons {
@@ -13,4 +13,18 @@
 }
 .galleryCard:hover .galleryActionButtons {
     display: inline;
+}
+.thumbnailImage {
+    height: 200px;
+    overflow: hidden;
+}
+.thumbnailImage img {
+    transition: transform 0.5s;
+    transition-timing-function: ease-in-out;
+    object-fit: contain;
+    height: 100%;
+    width: 100%;
+}
+.thumbnailImage img:hover {
+    transform: scale(2.5);
 }

@@ -53,7 +53,7 @@ form.ng-submitted .invalid-feedback {
 .select2-selection--multiple {
   border: var(--cui-border-width) solid var(--cui-border-color) !important;
   min-height: 38px !important;
-  border-radius: var(--cui-border-radius) !important;
+  border-radius: 0 var(--cui-border-radius) var(--cui-border-radius) 0 !important;
 }
 .wideSelect {
   width: 100% !important;
@@ -64,4 +64,10 @@ form.ng-submitted .invalid-feedback {
 }
 .sidebar-header {
   padding-bottom: 0px;
+}
+.buttonGroupLabel {
+  color: var(--cui-input-group-addon-color, var(--cui-body-color)) !important;
+  background-color: var(--cui-input-group-addon-bg, var(--cui-tertiary-bg)) !important;
+  border: var(--cui-border-width) solid var(--cui-input-group-addon-border-color, var(--cui-border-color)) !important;
+  cursor: text !important;
 }

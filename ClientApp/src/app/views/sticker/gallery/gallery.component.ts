@@ -121,8 +121,7 @@ export class GalleryComponent implements OnInit{
               IdSticker: 0,
               IdImage: image.IdImage,
               StickerImage: new FormData,
-              Src: '',
-              StickerThumbnail: `data:image/jpeg;base64,${image.StickerThumbnail}`,
+              Src: `data:image/jpeg;base64,${image.StickerImage}`,
               StickerName: image.StickerName
             }
           });

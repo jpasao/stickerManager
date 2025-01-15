@@ -26,6 +26,12 @@ export class DashboardRepositoryService {
     );
   }
 
+  public getCategory = () => {
+    return this.http.get<Dashboard[]>(
+      this.request.createCompleteRoute(ApiAddresses.Dashboard, EndPoints.Category)
+    );
+  }
+
   public getTag = () => {
     return this.http.get<Dashboard[]>(
       this.request.createCompleteRoute(ApiAddresses.Dashboard, EndPoints.Tag)

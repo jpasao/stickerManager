@@ -8,13 +8,13 @@
   <c-card-body>
     <form cForm (ngSubmit)="onSubmit()" [formGroup]="tagForm">
       <c-row gutter="3" class="align-items-center">
-        <c-col xs="11">
+        <c-col xs="12" md="11"  class="mt-3">
           <c-input-group class="flex-nowrap">
             <span cInputGroupText>Nombre</span>
             <input cFormControl type="text" formControlName="name" />
           </c-input-group>
         </c-col>
-        <c-col xs="1">
+        <c-col xs="12" md="1" class="mt-3">
           <button cButton type="submit" class="float-end">Buscar</button>
         </c-col>
       </c-row>

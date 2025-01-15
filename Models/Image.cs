@@ -14,8 +14,6 @@ public class Image
     public string? StickerName { get; set; }
 
     public required byte[] StickerImage { get; set; }
-
-    public required byte[] StickerThumbnail { get; set; }
 }
 
 public record Gallery

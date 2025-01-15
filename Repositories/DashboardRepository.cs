@@ -76,8 +76,8 @@ public class DashboardRepository(IOptions<ConnectionString> connectionStrings) :
         {
             var sql = @"SELECT COUNT(*) as Quantity, C.CategoryName AS Category
                 FROM categories C
-	                INNER JOIN stickercategories S ON S.IdCategory = C.IdCategory
-                GROUP BY S.IdCategory
+	                INNER JOIN tagcategories T ON T.IdCategory = C.IdCategory
+                GROUP BY T.IdCategory
                 ORDER BY Category";
             var response = await db.QueryAsync<Dashboard>(sql).ConfigureAwait(false);
 

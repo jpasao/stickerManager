@@ -1,0 +1,115 @@
+<c-card>
+    <c-card-header>
+      <c-row class="justify-content-between align-items-center">
+        <c-col xs="8" md="1"><span>Filtros</span></c-col>
+        <c-col xs="4" md="1"><button cButton type="reset" color="secondary" variant="outline" (click)="onReset()">Limpiar</button></c-col>
+      </c-row>
+    </c-card-header>
+    <c-card-body>
+      <form cForm (ngSubmit)="onSubmit()" [formGroup]="categoryForm">
+        <c-row gutter="3" class="align-items-center">
+          <c-col xs="12" md="5"  class="mt-3">
+            <c-input-group class="flex-nowrap">
+              <span cInputGroupText>Nombre</span>
+              <input cFormControl type="text" formControlName="name" />
+            </c-input-group>
+          </c-col>
+          <c-col xs="12" md="6" class="mt-3">
+            <c-input-group class="flex-nowrap">
+                <span cInputGroupText>Etiquetas</span>
+                <select2 formControlName="tag" multiple="true" [data]="tags"
+                    noResultMessage="Enter para crear una nueva etiqueta" (autoCreateItem)="handleCreateTag($event)"
+                    resetSelectedValue="" autoCreate resettable class="wideSelect" displaySearchStatus="always">
+                </select2>
+            </c-input-group>
+          </c-col>
+          <c-col xs="12" md="1" class="mt-3">
+            <button cButton type="submit" class="float-end">Buscar</button>
+          </c-col>
+        </c-row>
+      </form>
+    </c-card-body>
+  </c-card>
+  <br />
+  <c-card>
+    <c-card-header>
+      Resultados
+      <label class="alignRight">
+        <select cSelect (change)="handleChangeTableRows($event)" [ngModel]="itemsPerPage">
+          @for(item of itemsPerTable; track item) {
+            <option>
+              {{item}}
+            </option>
+          }
+        </select>
+      </label>
+    </c-card-header>
+    <c-card-body>
+      <c-row>
+        <c-col [xs]="12" [md]="6">
+          <table cTable hover stripped bordered>
+            <thead >
+              <tr>
+                <th class="bg-body-tertiary col-md-9">Nombre</th>
+                <th class="bg-body-tertiary col-md-3">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (category of pagedItems; track category.IdCategory) {
+                <tr>
+                  <td>{{category.CategoryName}}</td>
+                  <td>
+                    <button cButton color="info" variant="ghost" (click)="openDetail(category)">
+                      <svg [cIcon]="actionIcons.cilFeaturedPlaylist"></svg>
+                    </button>
+                    <button cButton color="warning" variant="ghost" (click)="onEdit(category)">
+                      <svg [cIcon]="actionIcons.cilPencil"></svg>
+                    </button>
+                    <button cButton color="danger" variant="ghost" (click)="openDeleteModal(category)">
+                      <svg [cIcon]="actionIcons.cilTrash"></svg>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </c-col>
+        <c-col [xs]="12" [md]="6">
+          <table cTable bordered>
+            <thead>
+              <tr>
+                <th class="bg-body-tertiary">Detalles</th>
+              </tr>
+            </thead>
+            <tbody *ngIf="!showDetails">
+              <tr>
+                <td>Haz click en
+                  <button cButton color="info" variant="ghost">
+                    <svg [cIcon]="actionIcons.cilFeaturedPlaylist"></svg>
+                </button>
+                para ver los detalles de la fila</td>
+              </tr>
+            </tbody>
+            <tbody *ngIf="showDetails">
+              <tr>
+                <td>Etiquetas:
+                  <br/>
+                  @if (hasTags) {
+                    @for(tag of categoryToHandle.Tag; track tag?.IdTag) {
+                      <c-badge color="secondary" variant="outline" style="margin-right: 5px;">{{tag?.TagName}}</c-badge>
+                    }
+                  }
+                  @else {
+                    <label>Aún no has definido ninguna etiqueta para {{categoryToHandle.CategoryName}}</label>
+                  }
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </c-col>
+      </c-row>
+
+      <app-grid-pager [itemsPerPage]="itemsPerPage" [totalItems]="categories.length" [currentPage]="currentPage" (pageNumber)="handlePageChange($event)"></app-grid-pager>
+    </c-card-body>
+  </c-card>
+  <app-modal [title]="modalTitle" [message]="modalMessage" (dialogResponse)="handleDeleteModalResponse($event)"></app-modal>

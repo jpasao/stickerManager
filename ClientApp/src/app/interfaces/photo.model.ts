@@ -4,5 +4,4 @@ export interface Photo {
   StickerImage: FormData;
   StickerName?: string;
   Src: string;
-  StickerThumbnail: string;
 }

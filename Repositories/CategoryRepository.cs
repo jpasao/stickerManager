@@ -20,8 +20,8 @@ public class CategoryRepository(IOptions<ConnectionString> connectionStrings) : 
             var builder = new SqlBuilder();
             var sql = @"SELECT C.IdCategory, C.CategoryName, T.IdTag, T.TagName
                 FROM categories C
-                    INNER JOIN tagcategories TC ON C.IdCategory = TC.IdCategory
-                    INNER JOIN tags T ON T.IdTag = TC.IdTag
+                    LEFT JOIN tagcategories TC ON C.IdCategory = TC.IdCategory
+                    LEFT JOIN tags T ON T.IdTag = TC.IdTag
                 /**where**/
                 ORDER BY C.CategoryName";
 
@@ -36,7 +36,6 @@ public class CategoryRepository(IOptions<ConnectionString> connectionStrings) : 
             {
                 var strTagList = string.Join(",", tagList);
                 builder.Where($"T.IdTag IN ({strTagList})", new { strTagList });
-
             }
             var categories = (await db.QueryAsync<Category, Tag, Category>(template.RawSql,
                 static (category, tag) =>
@@ -150,10 +149,11 @@ public class CategoryRepository(IOptions<ConnectionString> connectionStrings) : 
         try
         {
             var sql = @"
-               SELECT T.TagName AS Name, 'Etiquetas' AS Category
+                SELECT S.StickerName AS Name, 'Pegatinas' AS Category
                 FROM categories C
                     INNER JOIN tagcategories TC ON C.IdCategory = TC.IdCategory
-                    INNER JOIN tags T ON TC.IdTag = T.IdTag
+                    INNER JOIN stickertags ST ON ST.IdTag = TC.IdTag
+                    INNER JOIN stickers S ON ST.IdSticker = S.IdSticker
                 WHERE C.IdCategory = @IdCategory
                 ORDER BY Name";
             var response = await db.QueryAsync<Dependency>(sql, new { IdCategory = id }).ConfigureAwait(false);

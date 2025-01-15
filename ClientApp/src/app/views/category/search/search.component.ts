@@ -1,49 +1,45 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgIf } from '@angular/common';
 
-import { cilPencil, cilTrash, cilFeaturedPlaylist } from '@coreui/icons';
-import {
-  CardComponent, CardHeaderComponent, CardBodyComponent, ImgDirective,
+import { cilFeaturedPlaylist, cilPencil, cilTrash } from '@coreui/icons';
+import { 
+  CardComponent, CardHeaderComponent, CardBodyComponent,
   ButtonDirective, ButtonGroupComponent, InputGroupComponent, InputGroupTextDirective,
   FormSelectDirective,
-  TableDirective, TableColorDirective,
+  TableDirective,
   RowComponent, ColComponent,
   FormDirective, FormLabelDirective, FormControlDirective,
   BadgeComponent
 } from '@coreui/angular';
-import { IconDirective } from '@coreui/icons-angular';
 import { Select2Module, Select2UpdateEvent, Select2Option } from 'ng-select2-component';
+import { IconDirective } from '@coreui/icons-angular';
 
 import { DefaultValuesService } from '../../../shared/services/default-values.service';
-import { StickerRepositoryService } from '../../../shared/services/network/sticker-repository.service';
-import { TagRepositoryService } from '../../../shared/services/network/tag-repository.service';
-import { PhotoRepositoryService } from '../../../shared/services/network/photo-repository.service';
+import { CategoryRepositoryService } from '../../../shared/services/network/category-repository.service';
 import { ColorClasses, EndPoints, Entities, Operations, ResponseTypes } from '../../../shared/enums.model';
-import { Sticker } from './../../../interfaces/sticker.model';
-import { Tag } from '../../../interfaces/tag.model';
-import { StickerFilter } from '../../../interfaces/sticker-filter.model';
+import { Category } from './../../../interfaces/category.model';
 import { ModalMessageComponent } from '../../../components/modal/modal-message.component';
 import { GridPagerComponent } from '../../../components/grid-pager/grid-pager.component';
-import { StickerFilterComponent } from '../../../components/sticker-filter/sticker-filter.component';
-import { ErrorMessage } from '../../../interfaces/error.model';
 import { ShowToastService } from '../../../shared/services/show-toast.service';
+import { ErrorMessage } from '../../../interfaces/error.model';
+import { TagRepositoryService } from '../../../shared/services/network/tag-repository.service';
+import { Tag } from '../../../interfaces/tag.model';
 
 @Component({
   selector: 'app-search',
   standalone: true,
   imports: [
-    CardComponent, CardHeaderComponent, CardBodyComponent, ImgDirective,
+    CardComponent, CardHeaderComponent, CardBodyComponent,
     ButtonDirective, ButtonGroupComponent, InputGroupComponent, InputGroupTextDirective,
     FormSelectDirective,
-    TableDirective, TableColorDirective,
-    RowComponent, ColComponent, 
+    TableDirective,
+    RowComponent, ColComponent,
     FormDirective, FormLabelDirective, FormControlDirective, FormsModule, ReactiveFormsModule,
     BadgeComponent,
     IconDirective,
     ModalMessageComponent,
-    StickerFilterComponent,
     GridPagerComponent,
     NgIf,
     Select2Module
@@ -51,11 +47,11 @@ import { ShowToastService } from '../../../shared/services/show-toast.service';
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss'
 })
-export class SearchComponent implements OnInit {
-  stickers: Sticker[] = [];
-  tags: Select2Option[] = [];
-  stickerToHandle!: Sticker;
-  stickerSearch!: Sticker;
+export class SearchComponent implements OnInit{
+  categories: Category[] = [];
+  categoryToHandle!: Category;
+  categoryForm!: FormGroup;
+  submitted = false;
   actionIcons = { cilPencil, cilTrash, cilFeaturedPlaylist };
   @ViewChild(ModalMessageComponent) modalComponent!: ModalMessageComponent;
   @ViewChild(GridPagerComponent) pagerComponent!: GridPagerComponent;
@@ -63,101 +59,111 @@ export class SearchComponent implements OnInit {
   modalMessage: string = '';
   currentPage: number = 1;
   itemsPerPage: number = 10;
-  pagedItems: Sticker[] = [];
+  pagedItems: Category[] = [];
   itemsPerTable: number[] = [];
-  totalItems: number = 0;
   showDetails: boolean = false;
-  stickerImage: string = '';
   hasTags: boolean = false;
+  tags: Select2Option[] = [];
 
-  constructor(
-    private stickerRepository: StickerRepositoryService,
+  constructor (
+    private repository: CategoryRepositoryService,
     private tagRepository: TagRepositoryService,
-    private photoRepository: PhotoRepositoryService,
     private defaults: DefaultValuesService,
+    private formBuilder: FormBuilder,
     private router: Router,
     private toast: ShowToastService
   ) { }
 
   ngOnInit(): void {
-    this.stickerToHandle = this.defaults.StickerObject();
+    this.categoryForm = this.formBuilder.group({ name: [""], tag: [""] });
+    this.getCategoriesList();
     this.getTags();
-    this.getStickers();
     this.currentPage = 1;
     this.itemsPerTable = this.defaults.ItemsPerTable;
-    this.itemsPerPage = this.defaults.GetItemsPerPage(EndPoints.Sticker);
+    this.itemsPerPage = this.defaults.GetItemsPerPage(EndPoints.Category);
   }
 
-  getFilters(event: StickerFilter) {
-    this.showDetails = false;
-    this.stickerToHandle.IdSticker = 0;
-    if (event) {
-      this.getStickers(event);
-    }
-  }
-  openDetail(sticker: Sticker) {
+  get form() { return this.categoryForm.controls; }
+
+  openDetail(category: Category) {
     this.showDetails = true;
-    this.stickerToHandle = sticker;
-    this.hasTags = sticker.Tag !== null;
-    this.photoRepository
-      .getPhotos(sticker)
-      .subscribe(response => {
-        this.stickerImage = (response !== null && response.length > 0)
-          ? `data:image/jpeg;base64,${response[0].StickerImage}`
-          : '';
-      })
+    this.categoryToHandle = category;
+    this.hasTags = category.Tag[0] !== null;
   }
-  onEdit(sticker: Sticker) {
-    this.router.navigate(['/stickers/save'], { state: sticker });
+  onSubmit() {
+    this.submitted = true;
+    const selectedTags = this.form['tag'].value;
+    let tagObject: Tag[] = [this.defaults.TagObject()];
+    if (selectedTags && selectedTags.length) {
+      tagObject = selectedTags.map((tag: string) => {
+        return {
+          IdTag: tag,
+          TagName: ''
+        }
+      });
+    }
+    const categorySearch: Category = {
+      IdCategory: 0,
+      CategoryName: this.form['name'].value || '',
+      Tag: tagObject
+    }
+    this.getCategoriesList(categorySearch);
   }
-  openDeleteModal(sticker: Sticker) {
-    this.stickerToHandle = sticker;
-    this.modalTitle = 'Borrando pegatina';
-    this.modalMessage = `Vas a borrar la pegatina '${sticker.StickerName}'. ¿Estás segura?`;
+  onReset() {
+    this.submitted = false;
+    this.categoryForm.reset();
+  }
+  onEdit(category: Category) {
+    this.router.navigate(['/categories/save'], { state: category });
+  }
+  openDeleteModal(category: Category) {
+    this.categoryToHandle = category;
+    this.modalTitle = 'Borrando categoría';
+    this.modalMessage = `Vas a borrar la categoría '${category.CategoryName}'. ¿Estás segura?`;
     this.modalComponent.toggleModal();
   }
   handleDeleteModalResponse(event: boolean) {
     if (event) {
       this.modalComponent.toggleModal();
-      this.onDelete(this.stickerToHandle);
+      this.onDelete(this.categoryToHandle);
     }
   }
-  onDelete(stickerToDelete: Sticker) {
-    let message: string = `La pegatina '${stickerToDelete.StickerName}' se ha borrado correctamente`;
-    const toastTitle = 'Borrando pegatina';
+  onDelete(categoryToDelete: Category) {
+    let message: string = `La categoría '${categoryToDelete.CategoryName}' se ha borrado correctamente`;
+    const toastTitle = 'Borrando categoría';
 
-    this.stickerRepository
-      .deleteSticker(stickerToDelete)
+    this.repository
+      .deleteCategory(categoryToDelete)
       .subscribe({
         next: (response) => {
           if (response > ResponseTypes.NO_CHANGE) {
-            if ((this.stickers.length - 1) % this.itemsPerPage === 0) {
+            if ((this.categories.length - 1) % this.itemsPerPage === 0) {
               this.currentPage = 1;
             }
             this.toast.show(toastTitle, message, ColorClasses.info);
-            this.getStickers();
+            this.getCategoriesList();
           } else {
-            message = `Ha habido un problema al borrar la pegatina '${stickerToDelete.StickerName}'`;
+            message = `Ha habido un problema al borrar la categoría '${categoryToDelete.CategoryName}'`;
             this.toast.show(toastTitle, message, ColorClasses.warning);
           }
         },
         error: (err) => {
-          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.delete, Entities.sticker);
+          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.delete, Entities.category);
           this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
         }
       });
   }
-  private getStickers = (sticker: StickerFilter = this.defaults.FilterObject()) => {
-    this.stickerRepository
-      .getStickers(sticker)
+  private getCategoriesList = (category: Category = this.defaults.CategoryObject()) => {
+    this.repository
+      .getCategories(category)
       .subscribe({
         next: (response) => {
-          this.stickers = response;
-          this.totalItems = response.length;
+          this.categories = response;
           this.setPager();
+          this.pagerComponent.setPageNumbers();
         },
         error: (err) => {
-          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.get, Entities.sticker);
+          const errorTexts: ErrorMessage = this.defaults.GetErrorMessage(err, Operations.get, Entities.category);
           this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
         }
       });
@@ -179,30 +185,6 @@ export class SearchComponent implements OnInit {
           this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
         }
       });
-  }
-  handlePageChange(event: number) {
-    if (event) {
-      this.currentPage = event;
-      this.setPager();
-    }
-  }
-  handleChangeTableRows(event: any) {
-    let receivedItemsPerPage = event?.target?.value;
-    if (isNaN(receivedItemsPerPage)) {
-      receivedItemsPerPage = 10;
-    }
-    this.currentPage = 1;
-    this.defaults.SaveItemsPerPage(receivedItemsPerPage.toString(), EndPoints.Sticker);
-    this.itemsPerPage = receivedItemsPerPage;
-    this.setPager();
-  }
-  setPager() {
-    this.pagerComponent.setPageNumbers();
-    this.pagedItems = this.defaults.GetPagedItems(this.stickers, this.currentPage, this.itemsPerPage);
-  }
-  getRowColor(sticker: Sticker) {
-    if (sticker === undefined || this.stickerToHandle === undefined) return '';
-    return sticker.IdSticker === this.stickerToHandle.IdSticker ? 'info' : ''
   }
   handleCreateTag(event: Select2UpdateEvent<any>) {
     if (event === null || event.value.value.length === 0) return;
@@ -235,5 +217,25 @@ export class SearchComponent implements OnInit {
           this.toast.show(errorTexts.Title, errorTexts.Message, ColorClasses.danger);
         }
       });
+  }
+  handlePageChange(event: number) {
+    if (event) {
+      this.currentPage = event;
+      this.setPager();
+    }
+  }
+  handleChangeTableRows(event: any) {
+    let receivedItemsPerPage = event?.target?.value;
+    if (isNaN(receivedItemsPerPage)) {
+      receivedItemsPerPage = 10;
+    }
+    this.currentPage = 1;
+    this.defaults.SaveItemsPerPage(receivedItemsPerPage.toString(), EndPoints.Category);
+    this.itemsPerPage = receivedItemsPerPage;
+    this.pagerComponent.setPageNumbers();
+    this.setPager();
+  }
+  setPager() {
+    this.pagedItems = this.defaults.GetPagedItems(this.categories, this.currentPage, this.itemsPerPage);
   }
 }

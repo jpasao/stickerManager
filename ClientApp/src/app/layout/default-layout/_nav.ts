@@ -25,7 +25,20 @@ export const navItems: INavData[] = [
     url: '/stickers/save',
     iconComponent: { name: 'cil-pencil' }
   },
-
+  {
+    name: 'Categorías',
+    title: true
+  },
+  {
+    name: 'Buscar',
+    url: '/categories/search',
+    iconComponent: { name: 'cil-tags' }
+  },
+  {
+    name: 'Añadir',
+    url: '/categories/save',
+    iconComponent: { name: 'cil-pencil' }
+  },
   {
     name: 'Etiquetas',
     title: true

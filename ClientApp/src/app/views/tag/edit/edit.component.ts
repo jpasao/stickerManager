@@ -65,7 +65,7 @@ export class EditComponent implements OnInit {
     this.isEditing = hasData;
     this.savePlaceholder = this.isEditing ? 'Editar' : 'Nueva';
   } 
-  
+
   ngOnInit(): void {
     this.tagEditForm = this.formBuilder.group({ name: [this.receivedTag.TagName, [Validators.required]] });
   }

@@ -103,7 +103,7 @@ export class EditComponent implements OnInit {
             label: tag.TagName
           }
         });
-        if (this.receivedSticker.Tag[0] !== null) {
+        if (this.receivedSticker.Tag !== null) {
           this.stickerTags = this.receivedSticker.Tag.map((tag) => tag.IdTag);
         }
       });
@@ -151,15 +151,11 @@ export class EditComponent implements OnInit {
             const imageSrc = (response !== null && response.length > 0)
             ? `data:image/jpeg;base64,${response[0].StickerImage}`
             : '';
-            const imageThumbnail = (response !== null && response.length > 0)
-            ? `data:image/jpeg;base64,${response[0].StickerThumbnail}`
-            : '';
             this.stickerImage = {
               IdSticker: this.receivedSticker.IdSticker || 0,
               IdImage: response[0].IdImage,
               StickerImage: new FormData,
               Src: imageSrc,
-              StickerThumbnail: imageThumbnail
             }
           }
         },
@@ -215,7 +211,7 @@ export class EditComponent implements OnInit {
     if (name.length === 0) {
       return;
     }
-    const tagsToSave = tags.length > 0
+    const tagsToSave = tags !== null
       ? tags.map((tag: any) => {
         let num = tag;
         if (isNaN(parseInt(num.toString()))) {
@@ -227,7 +223,8 @@ export class EditComponent implements OnInit {
     const stickerToSave: Sticker = {
       IdSticker: this.isEditing ? this.receivedSticker.IdSticker : 0,
       StickerName: this.form['name'].value,
-      Tag: tagsToSave
+      Tag: tagsToSave,
+      Category: []
     };
     this.saving = true;
     if (this.isEditing) {
@@ -276,7 +273,9 @@ export class EditComponent implements OnInit {
           IdSticker: result
         };
       }
-      this.saveImage();
+      if (this.stickerImage.StickerImage.get('images') !== null) {
+        this.saveImage();
+      }
     }
   }
 
@@ -292,15 +291,11 @@ export class EditComponent implements OnInit {
             IdImage: 0,
             StickerImage: new FormData,
             Src: `${base64}`,
-            StickerThumbnail: ''
           };
         });
 
-      const thumbnail = await this.defaults.getThumbnail(fileList[0]);
-
       const formData = new FormData();
       formData.append('images', fileList[0]);
-      formData.append('images', thumbnail);
       this.stickerImage = {
         ...this.stickerImage,
         StickerImage: formData
@@ -324,7 +319,6 @@ export class EditComponent implements OnInit {
               IdImage: response,
               StickerImage: new FormData,
               Src: this.stickerImage.Src,
-              StickerThumbnail: ''
             };
             this.toast.show(toastTitle, message, ColorClasses.info);
           }

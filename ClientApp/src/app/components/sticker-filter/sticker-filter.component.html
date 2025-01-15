@@ -11,51 +11,57 @@
     <c-card-body>
         <form [formGroup]="stickerForm">
             <c-row gutter="3" class="align-items-center">
-                <c-col xs="12" md="6">
+                <c-col xs="12" md="4" class="mb-2">
                     <c-input-group class="flex-nowrap">
                         <span cInputGroupText>Nombre</span>
                         <input cFormControl type="text" formControlName="name" />
                     </c-input-group>
                 </c-col>
-                <c-col xs="12" md="6">
+                <c-col xs="12" md="4" class="mb-2">
+                    <c-input-group class="flex-nowrap">
+                        <span cInputGroupText>Categorías</span>
+                        <select2 formControlName="category" multiple="true" [data]="categories"
+                            noResultMessage="Enter para crear una nueva categoría" (autoCreateItem)="handleCreateCategory($event)"
+                            resetSelectedValue="" autoCreate resettable displaySearchStatus="always" class="wideSelect">
+                        </select2>
+                    </c-input-group>
+                </c-col>
+                <c-col xs="12" md="4" class="mb-2">
                     <c-input-group class="flex-nowrap">
                         <span cInputGroupText>Etiquetas</span>
                         <select2 formControlName="tag" multiple="true" [data]="tags"
                             noResultMessage="Enter para crear una nueva etiqueta" (autoCreateItem)="handleCreateTag($event)"
-                            resetSelectedValue="" autoCreate resettable class="wideSelect">
+                            resetSelectedValue="" autoCreate resettable displaySearchStatus="always" class="wideSelect">
                         </select2>
                     </c-input-group>
                 </c-col>
             </c-row>
         </form>
-        <br />
         <form cForm (ngSubmit)="getFilters()" [formGroup]="radioForm">
             <c-row>
-                <c-col xs="12" md="6">
-                    <c-input-group class="flex-nowrap">
-                        <span cInputGroupText>Ordenar por</span>
-                        <c-button-group aria-label="radio field button group" role="group">
-                            <input class="btn-check" formControlName="field" type="radio" value="date" />
-                            <label (click)="setFieldValue('date')" cButton cFormCheckLabel variant="outline">Fecha</label>
-                            <input class="btn-check" formControlName="field" type="radio" value="name" />
-                            <label (click)="setFieldValue('name')" cButton cFormCheckLabel variant="outline">Nombre</label>
-                        </c-button-group>
-                    </c-input-group>
+                <c-col xs="12" md="4" class="mt-2">
+                    <c-button-group aria-label="radio field button group" role="group">
+                        <input class="btn-check" formControlName="field" type="radio" value="date" />
+                        <label cButton cFormCheckLabel class="buttonGroupLabel">Ordenar por</label>
+                        <input class="btn-check" formControlName="field" type="radio" value="date" />
+                        <label (click)="setFieldValue('date')" cButton cFormCheckLabel variant="outline">Fecha</label>
+                        <input class="btn-check" formControlName="field" type="radio" value="name" />
+                        <label (click)="setFieldValue('name')" cButton cFormCheckLabel variant="outline">Nombre</label>
+                    </c-button-group>
                 </c-col>
-                <c-col xs="12" md="5">
-                    <c-input-group class="flex-nowrap">
-                        <span cInputGroupText>Sentido</span>
-                        <c-button-group aria-label="radio ascend button group" role="group">
-                            <input class="btn-check" formControlName="ascend" type="radio" value="asc" />
-                            <label (click)="setAscendingValue('asc')" cButton cFormCheckLabel
-                                variant="outline">Ascendente</label>
-                            <input class="btn-check" formControlName="ascend" type="radio" value="desc" />
-                            <label (click)="setAscendingValue('desc')" cButton cFormCheckLabel
-                                variant="outline">Descendente</label>
-                        </c-button-group>
-                    </c-input-group>
+                <c-col xs="12" md="7" class="mt-2">
+                    <c-button-group aria-label="radio ascend button group" role="group">
+                        <input class="btn-check" formControlName="field" type="radio" value="date" />
+                        <label cButton cFormCheckLabel class="buttonGroupLabel">Sentido</label>
+                        <input class="btn-check" formControlName="ascend" type="radio" value="asc" />
+                        <label (click)="setAscendingValue('asc')" cButton cFormCheckLabel
+                            variant="outline">Ascendente</label>
+                        <input class="btn-check" formControlName="ascend" type="radio" value="desc" />
+                        <label (click)="setAscendingValue('desc')" cButton cFormCheckLabel
+                            variant="outline">Descendente</label>
+                    </c-button-group>
                 </c-col>
-                <c-col xs="12" md="1">
+                <c-col xs="12" md="1" class="mt-2">
                     <button cButton type="submit" class="float-end">Buscar</button>
                 </c-col>
             </c-row>

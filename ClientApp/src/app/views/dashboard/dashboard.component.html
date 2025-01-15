@@ -13,10 +13,19 @@
   </c-col>
   <c-col xs="12" md="6" class="my-2">
     <c-card class="h-100">
-      <c-card-header>¿Cuántas pegatinas tiene cada etiqueta?</c-card-header>
+      <c-card-header>
+        ¿Cuántas pegatinas tiene cada 
+        <label>
+          <select cSelect (change)="handleChangeChartType($event)">
+              <option value="tag">etiqueta</option>
+              <option value="category">categoría</option>
+          </select>
+        </label>
+        ?
+      </c-card-header>
       <c-card-body id="tagContainer">
         <c-chart
-          [data]="tagData"
+          [data]="donutData"
           type="doughnut">
         </c-chart>
       </c-card-body>
