@@ -19,8 +19,8 @@
     overflow: hidden;
 }
 .thumbnailImage img {
-    transition: transform 0.5s;
-    transition-timing-function: ease-in-out;
+    transition: transform 1s;
+    transition-timing-function: cubic-bezier(.55,-0.59,.24,.99);
     object-fit: contain;
     height: 100%;
     width: 100%;

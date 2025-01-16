@@ -167,7 +167,7 @@ export class EditComponent implements OnInit {
   }
 
   openDeleteModal() {
-    if (this.isEditing) {
+    if (this.stickerImage && this.stickerImage.IdImage !== 0) {
       this.modalTitle = 'Borrando imagen';
       this.modalMessage = `Vas a borrar la imagen de '${this.receivedSticker.StickerName}'. ¿Estás segura?`;
       this.modalComponent.toggleModal();
@@ -273,7 +273,7 @@ export class EditComponent implements OnInit {
           IdSticker: result
         };
       }
-      if (this.stickerImage.StickerImage.get('images') !== null) {
+      if (this.stickerImage.StickerImage && this.stickerImage.StickerImage.get('images') !== null) {
         this.saveImage();
       }
     }
@@ -287,9 +287,9 @@ export class EditComponent implements OnInit {
         .convertToBase64(fileList[0])
         .then((base64) => {
           this.stickerImage = {
+            ...this.stickerImage,
             IdSticker: this.receivedSticker.IdSticker,
             IdImage: 0,
-            StickerImage: new FormData,
             Src: `${base64}`,
           };
         });

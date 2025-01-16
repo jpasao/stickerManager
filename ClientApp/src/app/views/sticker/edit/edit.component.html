@@ -42,7 +42,7 @@
                   </form>
                   </c-col>
                   <c-col xs="12" md="6">
-                    @if (stickerImage && stickerImage.Src !== '') {
+                    @if (stickerImage && stickerImage.Src && stickerImage.Src !== '') {
                       <img cImg fluid [src]="stickerImage.Src" thumbnail />
                       <div class="d-grid gap-2 d-md-flex justify-content-md-between my-3">
                         <button cButton color="danger" class="me-md-2" (click)="openDeleteModal()">Borrar</button>
@@ -55,10 +55,8 @@
                     }
                     @else {
                       <div class="mb-3">
-                        <label cLabel for="formFile">
-                          {{isEditing ? 'Esta pegatina aún no tiene imagen' : 'Añade una imagen'}}
-                        </label>
-                        <input cFormControl id="formFile" type="file" (change)="showImage($event)" />
+                        <label cLabel for="formFile">Añade una imagen</label>
+                        <input cFormControl id="formFile" type="file" (change)="showImage($event)" accept="image/*"/>
                       </div>
                     }
                   </c-col>
